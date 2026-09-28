@@ -1,0 +1,27 @@
+# Raw per-sample datasets (multi-GB; distributed via Zenodo, see README
+# Data Availability Statement). Individual shards exceed GitHub's 100MB
+# per-file limit, so these must stay untracked.
+SINGLE/data/SINGLE_dataset.zip
+SINGLE/data/SINGLE_dataset/
+MULTI/data/MULTI_dataset.zip
+MULTI/data/MULTI_dataset/
+
+# Split train/val/test folders generated from the raw shards by the
+# "helyx_testing" notebooks (per-sample image/label files).
+SINGLE/images/
+SINGLE/y/
+SINGLE/DELTAL/
+SINGLE/quad/
+SINGLE/affine/
+SINGLE/const/
+SINGLE/poly/
+MULTI/images_multi/
+MULTI/tip1/
+MULTI/tip2/
+MULTI/tip3/
+MULTI/quad/
+MULTI/affine/
+MULTI/const/
+MULTI/DELTAL/
+MULTI/DELTAL_sensing/
+MULTI/end_effector/
