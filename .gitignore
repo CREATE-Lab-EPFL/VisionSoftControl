@@ -25,3 +25,7 @@ MULTI/const/
 MULTI/DELTAL/
 MULTI/DELTAL_sensing/
 MULTI/end_effector/
+
+# Python bytecode cache
+__pycache__/
+*.pyc
