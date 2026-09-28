@@ -1,0 +1,158 @@
+{
+  "results/PolygonDatadriven_30sides_120mm_350mm.npz": {
+    "center": [
+      -9.784605092862314e-15,
+      -5.684341886080802e-14
+    ],
+    "radius": 120.00000000000004,
+    "z_ref": 350.0,
+    "radial_rms": 7.627467653223723,
+    "radial_mean_abs": 5.884516031863165,
+    "height_rms": 2.099301682479988,
+    "height_mean_abs": 1.5998910686067482,
+    "n_points": 19847
+  },
+  "results/PolygonDatadriven_30sides_80mm_380mm.npz": {
+    "center": [
+      -8.806144583576084e-15,
+      -2.842170943040401e-14
+    ],
+    "radius": 80.0,
+    "z_ref": 380.0,
+    "radial_rms": 5.851260404975601,
+    "radial_mean_abs": 4.43501092748721,
+    "height_rms": 2.722046992115018,
+    "height_mean_abs": 2.0628213704436247,
+    "n_points": 17218
+  },
+  "results/PolygonJacobian_30sides_120mm_350mm.npz": {
+    "center": [
+      -9.784605092862314e-15,
+      -1.7053025658242404e-13
+    ],
+    "radius": 120.00000000000001,
+    "z_ref": 350.0,
+    "radial_rms": 7.780770577033618,
+    "radial_mean_abs": 6.469292663733762,
+    "height_rms": 5.744322757844305,
+    "height_mean_abs": 4.447889826959605,
+    "n_points": 43240
+  },
+  "results/PolygonJacobian_30sides_80mm_380mm.npz": {
+    "center": [
+      -8.806144583576084e-15,
+      -2.842170943040401e-14
+    ],
+    "radius": 80.0,
+    "z_ref": 380.0,
+    "radial_rms": 6.252436890243145,
+    "radial_mean_abs": 5.046543383289986,
+    "height_rms": 3.4331280708797336,
+    "height_mean_abs": 2.880602196725562,
+    "n_points": 19847
+  },
+  "results/PolygonJacobian_W50g_30sides_120mm_350mm.npz": {
+    "center": [
+      -9.784605092862314e-15,
+      -1.7053025658242404e-13
+    ],
+    "radius": 120.00000000000001,
+    "z_ref": 350.0,
+    "radial_rms": 11.459017499045455,
+    "radial_mean_abs": 8.900828161427196,
+    "height_rms": 6.458941636401437,
+    "height_mean_abs": 4.967788931803812,
+    "n_points": 20000
+  },
+  "results/PolygonJacobian_W50g_30sides_80mm_380mm.npz": {
+    "center": [
+      -8.806144583576084e-15,
+      -2.842170943040401e-14
+    ],
+    "radius": 80.0,
+    "z_ref": 380.0,
+    "radial_rms": 5.3535001830020175,
+    "radial_mean_abs": 4.021713816572134,
+    "height_rms": 1.6310865971407809,
+    "height_mean_abs": 1.1913771497926016,
+    "n_points": 20000
+  },
+  "results/PolygonOpenLoopDatadriven_30sides_120mm_350mm.npz": {
+    "center": [
+      -9.784605092862314e-15,
+      -1.7053025658242404e-13
+    ],
+    "radius": 120.00000000000001,
+    "z_ref": 350.0,
+    "radial_rms": 10.855200610463157,
+    "radial_mean_abs": 8.33727738596753,
+    "height_rms": 4.4117996385846565,
+    "height_mean_abs": 3.7708588372362724,
+    "n_points": 1818
+  },
+  "results/PolygonOpenLoopDatadriven_30sides_80mm_380mm.npz": {
+    "center": [
+      -8.806144583576084e-15,
+      -2.842170943040401e-14
+    ],
+    "radius": 80.0,
+    "z_ref": 380.0,
+    "radial_rms": 5.526917381768892,
+    "radial_mean_abs": 4.886252202885458,
+    "height_rms": 7.673338953191293,
+    "height_mean_abs": 7.004761932898831,
+    "n_points": 1208
+  },
+  "results/PolygonOpenLoopJacobian_30sides_120mm_350mm.npz": {
+    "center": [
+      -9.784605092862314e-15,
+      -1.7053025658242404e-13
+    ],
+    "radius": 120.00000000000001,
+    "z_ref": 350.0,
+    "radial_rms": 12.641955690856594,
+    "radial_mean_abs": 10.633353350591687,
+    "height_rms": 8.100318265935352,
+    "height_mean_abs": 6.9796353984593695,
+    "n_points": 1835
+  },
+  "results/PolygonOpenLoopJacobian_30sides_80mm_380mm.npz": {
+    "center": [
+      -8.806144583576084e-15,
+      -2.842170943040401e-14
+    ],
+    "radius": 80.0,
+    "z_ref": 380.0,
+    "radial_rms": 10.595864865869395,
+    "radial_mean_abs": 9.353619902070506,
+    "height_rms": 5.239074566451406,
+    "height_mean_abs": 4.850053226564507,
+    "n_points": 1213
+  },
+  "results/PolygonOpenLoopJacobian_W50g_30sides_120mm_350mm.npz": {
+    "center": [
+      -9.784605092862314e-15,
+      -1.7053025658242404e-13
+    ],
+    "radius": 120.00000000000001,
+    "z_ref": 350.0,
+    "radial_rms": 27.09527942536699,
+    "radial_mean_abs": 23.560593691896507,
+    "height_rms": 28.457857738644602,
+    "height_mean_abs": 23.278806669016678,
+    "n_points": 1824
+  },
+  "results/PolygonOpenLoopJacobian_W50g_30sides_80mm_380mm.npz": {
+    "center": [
+      -8.806144583576084e-15,
+      -2.842170943040401e-14
+    ],
+    "radius": 80.0,
+    "z_ref": 380.0,
+    "radial_rms": 20.640180244414793,
+    "radial_mean_abs": 16.914126257693685,
+    "height_rms": 11.21641144672451,
+    "height_mean_abs": 10.410902018617527,
+    "n_points": 1218
+  }
+}
