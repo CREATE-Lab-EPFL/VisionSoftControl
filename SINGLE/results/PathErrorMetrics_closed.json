@@ -1,0 +1,54 @@
+{
+  "results/PolygonWS_30_115_datadriven_mocap.npz": {
+    "center": [
+      -0.045004814863204956,
+      0.022766225039958954
+    ],
+    "radius": 34.59558868408203,
+    "z_ref": 115.01162719726562,
+    "radial_rms": 1.7147667166396718,
+    "radial_mean_abs": 1.4068334463788164,
+    "height_rms": 2.4942477188821264,
+    "height_mean_abs": 2.2890752303632937,
+    "n_points": 2923
+  },
+  "results/PolygonWS_30_115_jacobian_mocap.npz": {
+    "center": [
+      0.024410810321569443,
+      -0.06280773878097534
+    ],
+    "radius": 31.402795791625977,
+    "z_ref": 114.94738006591797,
+    "radial_rms": 1.4643358626461405,
+    "radial_mean_abs": 1.2668623521711326,
+    "height_rms": 2.6524441287863953,
+    "height_mean_abs": 2.428719567778277,
+    "n_points": 2991
+  },
+  "results/PolygonWS_30_125_datadriven_mocap.npz": {
+    "center": [
+      -0.029546763747930527,
+      0.0480039045214653
+    ],
+    "radius": 24.86502456665039,
+    "z_ref": 124.94412231445312,
+    "radial_rms": 1.825165584466034,
+    "radial_mean_abs": 1.497527418603622,
+    "height_rms": 1.5407260133714547,
+    "height_mean_abs": 1.378513329476118,
+    "n_points": 2040
+  },
+  "results/PolygonWS_30_125_jacobian_mocap.npz": {
+    "center": [
+      -0.04697003588080406,
+      -0.025047386065125465
+    ],
+    "radius": 22.420076370239258,
+    "z_ref": 124.99712371826172,
+    "radial_rms": 1.3207369125083461,
+    "radial_mean_abs": 1.050909539961618,
+    "height_rms": 1.2255061872374913,
+    "height_mean_abs": 1.1164040553329428,
+    "n_points": 2083
+  }
+}

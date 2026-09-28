@@ -1,0 +1,54 @@
+{
+  "results/PolygonWS_30_115_OL_datadriven.npz": {
+    "center": [
+      -0.045004814863204956,
+      0.022766225039958954
+    ],
+    "radius": 34.59558868408203,
+    "z_ref": 115.01162719726562,
+    "radial_rms": 2.26936808907517,
+    "radial_mean_abs": 1.9343843976028519,
+    "height_rms": 5.480537468668881,
+    "height_mean_abs": 5.453076504708141,
+    "n_points": 3259
+  },
+  "results/PolygonWS_30_115_OL_jacobian.npz": {
+    "center": [
+      0.024410810321569443,
+      -0.06280773878097534
+    ],
+    "radius": 31.402795791625977,
+    "z_ref": 114.94738006591797,
+    "radial_rms": 8.063306120910841,
+    "radial_mean_abs": 8.040631936449065,
+    "height_rms": 8.738948419409233,
+    "height_mean_abs": 8.696544065427444,
+    "n_points": 3401
+  },
+  "results/PolygonWS_30_125_OL_datadriven.npz": {
+    "center": [
+      -0.029546763747930527,
+      0.0480039045214653
+    ],
+    "radius": 24.86502456665039,
+    "z_ref": 124.94412231445312,
+    "radial_rms": 1.6126164229624518,
+    "radial_mean_abs": 1.3250902627061354,
+    "height_rms": 4.406478100989916,
+    "height_mean_abs": 4.35745971368983,
+    "n_points": 2289
+  },
+  "results/PolygonWS_30_125_OL_jacobian.npz": {
+    "center": [
+      -0.04697003588080406,
+      -0.025047386065125465
+    ],
+    "radius": 22.420076370239258,
+    "z_ref": 124.99712371826172,
+    "radial_rms": 5.7106645589268625,
+    "radial_mean_abs": 5.640549442760918,
+    "height_rms": 4.301065773825007,
+    "height_mean_abs": 4.289104808958209,
+    "n_points": 2450
+  }
+}
