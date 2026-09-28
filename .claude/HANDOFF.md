@@ -175,7 +175,7 @@ huge refactor").
 
 (`Yoo et al.` is already `Ref. [15]` in the manuscript — not new.)
 
-## MULTI workspace coverage, S31, S30 — done
+## MULTI workspace coverage, S31 — done; S30 done-then-reverted (see below)
 
 - `MULTI/MULTI_workspace_coverage.py` + `.ipynb` — Comment 7's MULTI half,
   done, both committed. Section-by-section: targets reach 23-43° max vs.
@@ -201,12 +201,14 @@ huge refactor").
   acquisition sessions (ask Lorenzo directly) before S31 can be answered —
   do not report regime counts as fact.**
 - S30 (matched target IDs + shared color scale for the Fig S4-S6-style
-  control-error scatter plots) — done: `SINGLE/results/S30_single_matched_targets.pdf`,
-  `MULTI/results/S30_multi_matched_targets.pdf`,
-  `MULTI/results/S30_multi_disturbance_matched_targets.pdf`. The generating
-  script (`S30_matched_figures.py`) was, like the other one-off analysis
-  scripts noted above, deliberately not kept in the repo — same user
-  preference, don't reconstruct it.
+  control-error scatter plots) — **done, then removed.** The 3 output PDFs
+  were produced by `S30_matched_figures.py`, which was deleted along with
+  the other unwanted root-level helper scripts; with no generating script
+  left anywhere, the PDFs were orphaned and were removed too (unlike
+  `MULTI_workspace_coverage.ipynb`/`MULTI_S31_sample_regimes.ipynb`, whose
+  underlying data-generating scripts are still in `MULTI/` and kept). **S30
+  is back to not-addressed** — if it's wanted, it needs redoing from
+  scratch, not recovering.
 
 ## Not started (bigger, lower priority)
 
