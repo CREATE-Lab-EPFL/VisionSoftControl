@@ -1,0 +1,32 @@
+\begin{table}[h]
+\centering
+\caption{Path errors of the trajectory-tracking experiments (Figs.~6, 9 and 10). Radial RMS: root-mean-square distance of the executed path from the reference circle, measured in the horizontal plane; height RMS: root-mean-square of $z - z_{\mathrm{ref}}$. The reference circle is the commanded one (center and radius of the commanded waypoints). Each row is a single run of one cycle; consecutive samples along a path are serially correlated and are not independent trials.}
+\label{tab:S7_paths}
+\begin{tabular}{lllrrr}
+\toprule
+Arm & Controller & Loop & $z_{\mathrm{ref}}$ [mm] & Radial RMS [mm] & Height RMS [mm] \\
+\midrule
+Single & Model-based & closed & 115 & 1.46 & 2.65 \\
+Single & Model-based & closed & 125 & 1.32 & 1.23 \\
+Single & Data-driven & closed & 115 & 1.71 & 2.49 \\
+Single & Data-driven & closed & 125 & 1.83 & 1.54 \\
+Single & Model-based & open & 115 & 8.06 & 8.74 \\
+Single & Model-based & open & 125 & 5.71 & 4.30 \\
+Single & Data-driven & open & 115 & 2.27 & 5.48 \\
+Single & Data-driven & open & 125 & 1.61 & 4.41 \\
+\midrule
+Multi & Model-based & closed & 350 & 7.78 & 5.74 \\
+Multi & Model-based & closed & 380 & 6.25 & 3.43 \\
+Multi & Data-driven & closed & 350 & 7.63 & 2.10 \\
+Multi & Data-driven & closed & 380 & 5.85 & 2.72 \\
+Multi & Model-based & open & 350 & 12.64 & 8.10 \\
+Multi & Model-based & open & 380 & 10.60 & 5.24 \\
+Multi & Data-driven & open & 350 & 10.86 & 4.41 \\
+Multi & Data-driven & open & 380 & 5.53 & 7.67 \\
+Multi & Model-based, 50 g & closed & 350 & 11.46 & 6.46 \\
+Multi & Model-based, 50 g & closed & 380 & 5.35 & 1.63 \\
+Multi & Model-based, 50 g & open & 350 & 27.10 & 28.46 \\
+Multi & Model-based, 50 g & open & 380 & 20.64 & 11.22 \\
+\bottomrule
+\end{tabular}
+\end{table}

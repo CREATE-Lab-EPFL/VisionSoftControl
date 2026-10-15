@@ -1,0 +1,18 @@
+\begin{table*}[h]
+\centering
+\footnotesize
+\caption{Comparison with closely related systems.}
+\label{tab:S10_comparison}
+\begin{tabular}{*{7}{>{\raggedright\arraybackslash}p{2.1cm}}}
+\toprule
+Work & Sensing & Robot & Estimated & Closed loop on the estimate & Redundancy resolution & Accuracy, rate \\
+\midrule
+Hofer et al.~\cite{hoferVisionBasedSensingApproach2021} & One internal camera per bellow (3), painted interior pattern, LED illumination & Pneumatic fabric spherical arm, 2 rotational DoF & Orientation (2 angles) & Yes, cascaded PI on the camera estimate & Actuation redundancy not exploited & $\approx 1^\circ$, 30~Hz \\
+Thuruthel et al.~\cite{thuruthelLearningClosedLoop2017} & End-effector position feedback & Tendon-driven continuum manipulator, 6 DoF & Tip position & Yes, learned inverse kinematics with feedback; with and without external loads & Implicit in the learned inverse kinematics & -- \\
+Han et al.~\cite{hanAnchoringMorphologicalRepresentations2025} & One internal camera tracking an anchor marker & Soft metastructure modules & Anchor motion, force, full-body shape & Not demonstrated & -- & -- \\
+Lu et al.~\cite{luAdaptiveOnlineLearning2024} & Fiber Bragg grating & Robotic colonoscope; multi-section extensible soft manipulators & 3D shape & Yes, adaptive online-learning shape servoing & -- & -- \\
+Yoo et al.~\cite{REF15} & Internal camera; model trained in simulation & Pneumatic soft actuator (100~mm) & 3D shape & No & -- & 10.12~mm tip error \\
+This work & One internal camera per section, no internal markers or patterns & Tendon-driven Trimmed Helicoid arm, 1 and 3 sections & Section-tip poses (6 DoF), PPC curvature & Yes, model-based (PCC Jacobian) and data-driven (learned inverse kinematics) & Null-space objective; secondary term in IK training & 3.99~mm, $3.11^\circ$ (1 section); $\approx 8$~Hz \\
+\bottomrule
+\end{tabular}
+\end{table*}

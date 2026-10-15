@@ -1,0 +1,35 @@
+\begin{table*}[h]
+\centering
+\footnotesize
+\caption{Reproducibility settings.}
+\label{tab:S11_repro}
+\begin{tabular}{>{\raggedright\arraybackslash}p{2.8cm} >{\raggedright\arraybackslash}p{6.2cm} >{\raggedright\arraybackslash}p{6.2cm}}
+\toprule
+Item & Single-section & Multi-section \\
+\midrule
+Cameras & \textbf{[FILL: model, lens/field of view, size, mass]}; USB, OpenCV (V4L2), $640 \times 480$ grayscale & Three cameras of the same model; one capture thread per camera, buffer of one frame, nominal 3~fps, latest frame used (software synchronization) \\
+Exposure and gain & \textbf{[FILL: automatic or fixed]} & \textbf{[FILL]} \\
+Network input & $1 \times 480 \times 640$, 8-bit, scaled to $[0, 1]$ inside the network & $3 \times 480 \times 640$, one camera per channel \\
+Pose CNN & MobileNetV2 (ImageNet weights), first convolution replaced by a 1-channel one; GAP (1280); linear head $1280 \to 6$ & MobileNetV2 with 3-channel first convolution; GAP (1280); head $1280 \to 512$ (LeakyReLU) $\to 18$ \\
+Curvature CNNs & Backbone initialized from $f_p^1$; linear heads $1280 \to 5 / 4 / 3$ & Backbone initialized from $f_p^3$; heads $1280 \to 512 \to 15 / 12 / 9$ \\
+Kinematic MLPs & $N_l^1$: $3 \to 128$ (linear, BatchNorm, LeakyReLU), three residual blocks of width 128, $128 \to 64 \to 32 \to 3$ & $N_p^3$: $9 \to 4 \times 128$ (ELU) $\to 6$; $N_l^3$: $6 \to 4 \times 128$ (ELU) $\to 9$, trained through the frozen $N_p^3$ with $\zeta = 0.01$ on the standardized tendon vector \\
+$N_C$ & $6 \to 128$, three residual blocks, $\to 5 / 4 / 3$; trained on single-section data & Applied to each section, on the section-tip pose expressed in the frame of the preceding tip \\
+Optimizer & Adam, learning rate $10^{-3}$, weight decay $5 \cdot 10^{-6}$ (CNNs) and $10^{-5}$ ($N_l^1$, $N_C$) & Adam, learning rate $10^{-3}$, weight decay $5 \cdot 10^{-6}$ \\
+Learning-rate schedule & Linear warm-up (10 iterations), then ReduceLROnPlateau (factor 0.5, patience 5) & Linear warm-up (CNNs), then ReduceLROnPlateau (factor 0.6 for CNNs, 0.9 for MLPs; patience 5 and 15) \\
+Epochs and early stopping & Maximum 500 epochs; patience 30 & Maximum 500 (CNNs), 800 ($N_p^3$), 2000 ($N_l^3$) epochs; patience 50 \\
+Batch size & 16 (images), 64 (MLPs) & 16 (images), 64 (MLPs); gradient clipping at 1.0 \\
+Loss & \textbf{[FILL: Huber or MSE, see note]} & Huber, $\delta = 1$ \\
+Angles & Regressed directly; sine and cosine inside the loss & Same \\
+Output normalization & Mean and standard deviation of the training split, stored with the exported models & Same \\
+Augmentation & Gaussian blur (kernel 5, $\sigma \le 8$), Gaussian noise ($\sigma \le 30$), brightness and contrast jitter (0.4), brightness shift (0.3), vignetting (0.6) & Same \\
+Seed and split & 42 (Python, NumPy, PyTorch); 85/10/5\% random split of pooled samples & Same \\
+Motors & Dynamixel XL330-M288-T, Protocol 2.0, 57,600 baud, extended position mode, pulley diameter 6~mm ($4096 / (6\pi)$ ticks per mm), position tolerance 20 ticks & Same, nine motors; sections II and III actuated through Bowden cables \\
+Pretension and current limit & \textbf{[FILL: criterion]}; current limit \textbf{[FILL]}~mA; same procedure for both arms & Same \\
+Tendons & \textbf{[FILL: material, diameter]} & Same \\
+Sampled tendon ranges & $U(-45, 10)$~mm per tendon & Independent mode: I $U(-25, 10)$, II $U(-35, 10)$, III $U(-40, 10)$~mm; coupled modes through the Bending Solver \\
+Acquisition sessions & One day (2025-06-19) & Two days (2025-07-18 and 2025-07-21); logging at 1~Hz, configuration held for $\approx 3$~s; $N_p^3$ data: three sessions (2025-07-25/26) \\
+Control parameters & $\lambda = 0.1$, $\varepsilon = 1$~mm, $\gamma = 3$~mm & $\lambda = 0.1$, $\varepsilon = 1$~mm, $\gamma = 10$ (SE(3) distance, Eq.~S16) \\
+Control targets & 20, $k$-medoids on sampled positions with $z > 115$~mm & 20, same procedure with $z > 200$~mm \\
+\bottomrule
+\end{tabular}
+\end{table*}

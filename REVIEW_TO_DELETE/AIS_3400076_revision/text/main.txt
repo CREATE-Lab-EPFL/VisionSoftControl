@@ -1,0 +1,1210 @@
+Advanced Intelligent Systems
+
+RESEARCH ARTICLE
+
+Internal Camera-based Reconstruction and Closed-loop
+Control of Soft Robotic Arms
+Lorenzo Vignoli1,2
+1
+
+⌋ Guanran Pei1
+
+⌋ Francesco Braghin2
+
+⌋ Josie Hughes1
+
+CREATE Lab, EPFL, 1015 Lausanne, Switzerland ⌋ 2 Department of Mechanical Engineering, Politecnico di Milano, 20133 Milano, Italy ⌋
+
+Correspondence: Lorenzo Vignoli (lorenzo.vignoli@ep!.ch)
+
+Received: XX Month Year ⌋ Revised: XX Month Year ⌋ Accepted: XX Month Year
+Keywords: Modeling, Control, and Learning for Soft Robots | Visual Proprioception | Redundant Robots | Model Learning for Control
+
+ABSTRACT
+
+Soft continuum robotic arms o"er unparalleled dexterity and compliance. However, their virtually in#nite degrees of freedom
+and nonlinear deformations pose signi#cant challenges for sensing and control. This paper proposes a vision-based framework
+for distributed state estimation and closed-loop control of tendon-driven soft robotic arms. Miniature cameras embedded in each
+section provide dense proprioceptive feedback, while convolutional neural networks map multi-view images to both tip pose and
+full-body reconstruction using a polynomial curvature model. Two alternative controllers are designed and evaluated. The #rst is a
+model-based null-space velocity controller that regulates tip pose while shaping tendon con#gurations. The second is a data-driven
+inverse kinematics neural network that maps task-space goals to tendon commands, with explicit secondary-objective optimization during training. Both approaches are validated in open- and closed-loop settings on single- and multi-section manipulators
+in quasi-static regimes. Experiments demonstrate that embedded vision enables accurate full-body state reconstruction, reliable
+redundancy resolution, and robust regulation even under external disturbances.
+
+1
+
+Introduction
+
+Soft robots draw inspiration from natural organisms to achieve
+compliance and distributed motion [1]. They are designed to passively deform and recon#gure to navigate complex environments
+and adapt to their surroundings. This embodied intelligence facilitates compliant coupling with external objects, stemming from
+variable impedance characteristics [2] and potentially in#nite degrees of freedom. Among soft robots, continuum manipulators
+are characterized by their slender con#guration, and capacity
+to have complex 3D curvatures. Due to their adaptability and
+safe interaction, they show promise in applications such as surgical tools for minimally invasive diagnosis [3], dexterous grasping and manipulation [4], and environmental monitoring and
+exploration [5]. However, they still lack precision and robustness to external disturbances [6], requiring dense sensing and
+redundancy-aware control.
+Accurate proprioceptive control in soft arms depends on adequate feedback, as they are strongly a"ected by deformations
+
+induced by environmental interactions, self-weight, and approximate modeling [7, 8]. Sensing technologies face major challenges,
+both in embedding sensors throughout the body and in reconstructing the end-e"ector pose from indirect measurements. One
+approach is to directly detect skin deformations using resistive or
+piezoresistive strain and pressure sensors, or Fiber Bragg Grating
+(FBG) nodes [5]. Another solution is to integrate Inertial Measurement Units (IMUs) into the arm, enabling high-frequency
+pose reconstruction while avoiding the occlusion and calibration
+issues of external sensing [6]. IMUs also allow estimation of body
+deformation under external forces [9].
+However, IMU sensing su"ers from drift [10] and, being nondistributed, cannot capture the global strain state. Camera-based
+approaches are increasingly used in soft robotics for pose reconstruction, as they can capture both global deformations and local
+interactions [11], while avoiding the integration challenges of embedded strain or pressure sensors [5]. External setups have been
+proposed, including stereometric systems for supervised shape
+learning [12] and model-free approaches for closed-loop full-body
+control of soft robots [7]. These methods nevertheless become
+
+Copyright Statement
+© 2026 XXXX
+
+Advanced Intelligent Systems, Year;v0:1–13
+https://doi.org/10.1002/0000
+
+1 of 13
+
+impractical in the presence of occlusions, and the cameras must
+remain #xed.
+For proprioceptive performance, the sensing system should track
+the robot motion from internal cameras, without interfering with
+movement or compliance of the structure. Previous works have
+embedded cameras inside the hollow body, often employing internal illumination such as structured light [13] to ensure consistent
+imaging. In this framework, a common approach is to place visual
+markers beneath the robot skin. To further improve robustness,
+image binarization is often applied before inference [14], and simulation is used to pre-train models for zero-shot transfer to the
+real world [15]. Approaches for reconstruction include geometric
+optimization from images [16] and deep learning architectures
+for state mapping. Embedded cameras provide high-resolution
+and accurate measurements of global deformations, without requiring complex distributed sensing hardware. Due to these advantages, vision-based strategies have been exploited for contact
+and displacement detection [11], tactile servoing [17], and force
+estimation [18].
+Onboard state estimation of soft structures allows for the deployment of various control architectures. Yet, controlling continuum
+arms presents signi#cant challenges. These systems are inherently redundant [1] and therefore o"er multiple possibilities to
+con#gure their actuation space. They possess extra degrees of
+freedom beyond those required to accomplish the primary task,
+a property referred to as kinematic redundancy in the null space.
+This redundancy enables the optimization of secondary objectives, such as minimizing control e"ort, improving manipulability, and avoiding obstacles or singularities [19]. Prior works
+have applied null-space control of soft robots, employing path
+planning algorithms such as RRT [20] to randomize the robot
+con#guration while reaching a goal, or teleoperating the tip of
+a continuum manipulator with a rigid-link master to maximize
+manipulability [21]. More advanced objectives, such as wholebody grasping [22], have been demonstrated by assigning and
+regulating task-space coordinates at several locations along the
+backbone. However, validation of these approaches has been
+limited to simulation. Alternatively, researchers have controlled
+tendon-driven origami soft robots by implicitly solving redundant
+inverse kinematics through constrained gradient-based optimization, using motion capture for feedback [23].
+Control strategies for continuum manipulators can be divided
+into model-based and data-driven approaches [1]. Many modelbased controllers adopt a spatial backbone representation that
+neglects volumetric deformations and focuses exclusively on the
+behavior of the central axis [24]. A general kinematic formulation
+is the Piecewise Constant Curvature (PCC) model [25], which
+approximates the robot as a sequence of circular arcs. Variants
+of this model have also been developed for Jacobian-based control [6]. More expressive alternatives include Cosserat rod models,
+which capture shear and torsional deformations through a geometrically exact formulation [26]. FEM-based frameworks further leverage continuum mechanics for simulation and control,
+at the cost of higher computational demand [27]. Data-driven
+controllers address the limitations of these approaches, including
+non-idealities in soft robotics such as friction, material anisotropy,
+and cable slack [1]. One direction is adaptive control, where
+an online learning loop updates model parameters from sensor
+feedback [28]. Another is iterative learning control, where the
+
+2 of 13
+
+robot improves its behavior by incorporating errors from previous executions into the feedforward command while preserving
+its natural compliance [2]. Alternatively, machine learning approaches can approximate the entire robot model. Researchers
+have developed a biLSTM-based framework for planning and
+control that relies only on motor encoder feedback [10].
+Addressing the sensing and control challenges of continuum
+manipulators, this paper proposes a strategy for vision-based reconstruction and control of soft robotic arms that scales with the
+number of segments. Information from miniature cameras embedded in the sections is fused within a single CNN to achieve
+full-body reconstruction. The reconstructed state is then used as
+feedback in both model-based and data-driven controllers, enabling tip regulation while reducing actuation e"ort. To the best
+of our knowledge, no framework has yet combined such sensing
+with closed-loop null-space control of continuum robots, either
+through model-based or learning-based approaches.
+The contributions of this paper include:
+1. A distributed and scalable vision-based sensing strategy for
+soft arms that uses miniature cameras embedded in each
+section of the robot. It provides dense, markerless feedback
+for full-body state reconstruction, and scales to arms with
+di"erent numbers of sections through modular hardware
+design and a lightweight CNN architecture.
+2. Integration of embedded vision with model-based nullspace control. We close the loop by combining camera-based
+state estimation with a Jacobian-based Piecewise Constant
+Curvature velocity controller.
+3. A data-driven framework for both sensing and control. We
+train learning-based inverse kinematics models to generate
+actuation commands while optimizing redundancy objectives.
+4. Experimental validation of precise pose regulation using
+both model-based and data-driven controllers, and demonstration of the advantages of closed-loop control under external disturbances.
+In the remainder of this paper, Section 2 describes the robot setup,
+the curvature models, and the data acquisition strategy. Section 3
+presents the deep learning methods and the control architectures.
+Section 4 outlines the experimental results. Section 5 summarizes
+the paper and discusses potential directions for future work. A formal de#nition of all notation and terminology used throughout
+these sections is provided in the Supporting Information.
+
+2
+
+Setup and Speci!cation
+
+2.1
+
+Experimental Setup
+
+In this work, we used two compressible soft robotic arms setups
+for the experiments: a multi-section arm con#guration, shown in
+Fig. 1, and a single-section arm con#guration which corresponds
+to the #rst segment of the multi-section arm. The multi-section
+robot comprises three independent modules, each 150 mm long
+and with a 60 mm diameter, based on the Trimmed Helicoid
+(TH) structure [29]. Each arm module is actuated by three motors (DYNAMIXEL xl330-m288-t) mounted on the robot base and
+connected via three cables arranged at 120⋛ around the circumferential direction. The top of each section is rigidly attached to
+the base of the next, and motor rotations allow both bending and
+
+Advanced Intelligent Systems, Year
+
+a
+
+b
+
+F I G U R E 1 | (a) Multi-section soft robot arm sensorization and reconstruction pipeline. Images from the three cameras are acquired simultaneously
+and fed to CNNs, which predict both the tip poses and the full-body curvature. (b) Robot setup. The tendon-driven arm consists of three independent
+segments, each actuated by three motors, with Bowden cables routing the tendons of sections II and III. The optical tracking system provides the groundtruth con#guration.
+
+compression through 6 mm-diameter pulley wheels. Three motors actuate the #rst section directly, while six drive the remaining
+two via Bowden cables such that their actuation is decoupled. The
+cables of Module II and III are rotated with respect to Module I
+of 60⋛ and 150⋛ , respectively. The base, pulleys, and camera supports were 3D printed in PolyLactic Acid (PLA), while helicoidal
+components in Thermoplastic PolyUrethane (TPU).
+Internal cameras are added to each section for proprioception,
+and are rigidly mounted between sections and at the robot base.
+Consequently, each view is #xed relative to the base of the subsequent section. The sensing setup has negligible impact on the
+compliance of the soft structure. Camera images are transmitted
+to a laptop via three USB cables at a resolution of 480 ω 640 in
+grayscale. No internal markers, #ducial tags, or structured light
+were used in this setup, but proprioception exploits the changing internal geometry of the structure with deformation. Camera
+views from the three sections are shown in Fig. 1a. To avoid interference from external light, the robot arm sections are covered
+with a di"usive layer attached to the skin. We tested two di"erent
+solutions: the single-section robot is covered with corrugated silicone to accommodate compression, whereas the multi-section
+arm employs a stretchable white fabric. Since both covering materials have negligible sti"ness compared to the robot structure,
+we assume equivalent kinematics of each section.
+To capture ground-truth data for the robot’s position and curvature, optical tracking markers are #xed at the base, at the end of
+1
+2
+each module, and at and of each section. A laptop receives
+3
+3
+tracking data from the Motive computer via an Ethernet switch
+and communicates with the motors through a U2D2 power hub
+board (DYNAMIXEL). Before each data acquisition session or
+experimental trial, the robots are calibrated by tightening all tendons through current control of the actuation motors. The motors
+then operate in position-control mode with a prede#ned current
+limit.
+
+2.2
+
+Problem Formulation
+
+To enable model-based control and full-body proprioception, we
+formulate two kinematic models: a simpli#ed one for control and
+a more expressive one for shape reconstruction.
+The model-based controller relies on the Piecewise Constant Curvature (PCC) kinematic approximation of soft continuum robots.
+Under the PCC assumption, each segment bends in any direction
+while maintaining constant curvature, resulting in a continuously di"erentiable backbone curve. Each actuation section is
+parameterized as shown in Fig. 2.
+
+F I G U R E 2 | PCC parameterization of soft robots according to both
+𝜔 (𝜀, 𝜗, 𝜛) and 𝜚 (ε𝜍 , ε𝜑 , 𝜛) parameters, derived from the four arc lengths
+{𝜛𝛻 }𝛻=1,…,4 . The tendon angles {𝜕𝛻 }𝛻=1,…,3 and the radius ℵ are also indicated.
+
+The 𝜔-parameterization for this robot is de#ned by three parameters: the bending angle 𝜀, the bending direction 𝜗, and the central
+axis length 𝜛. However, this transformation is not an isomorphism and may lead to Jacobian rank loss [30]. We therefore
+adopt the 𝜚-parameterization 𝜚 = [ε𝜍 , ε𝜑 , 𝜛]T , where ε𝜍 =
+𝜀ℵ cos 𝜗 and ε𝜑 = 𝜀ℵ sin 𝜗 are base arc-length di"erences derived from the four arc lengths 𝜛1 , 𝜛2 , 𝜛3 , 𝜛4 (Fig. 2), and ℵ is the
+
+3 of 13
+
+a
+
+b
+
+F I G U R E 3 | (a) Convolutional neural network (CNN) architecture used for full-body reconstruction. Stacked images from embedded cameras are
+processed through data augmentation and custom convolutional kernels. A MobileNetV2 backbone with inverted residual bottlenecks is #ne-tuned on
+our dataset and followed by global average pooling (GAP) to produce a compact feature vector. This representation is used to predict tip poses (6 outputs
+for the single-section, 18 for the multi-section) or curvature parameters for each section, using dedicated networks for di"erent approximations. Transfer
+learning is applied between pose and curvature networks and to adapt the single-section to the multi-section network. (b) Multi-layer perceptron (MLP)
+architecture used for kinematics approximations. The network consists of an input projection layer, residual blocks, and an output regression head. The
+input vector is projected into a 128-dimensional latent space and processed through three residual blocks, each comprising two fully connected layers
+with Batch Normalization and LeakyReLU activations. Skip connections enable residual learning and help mitigate vanishing gradients.
+
+section radius. De#ning the tendon lengths as ℶ = [ℶ1 , ℶ2 , ℶ3 ]T , with
+tendons at angles 𝜕𝛻 :
+ℶ𝛻 = 𝜛 ϑ 𝜀ℵ cos (𝜕𝛻 ϑ 𝜗) = 𝜛 ϑ ε𝜍 cos 𝜕𝛻 ϑ ε𝜑 sin 𝜕𝛻
+
+yielding the mapping between ℶ and 𝜚 as:
+ε𝜍 = ϑ
+
+3
+3
+3
+2⌈
+2⌈
+1⌈
+ℶ𝛻 cos 𝜕𝛻 , ε𝜑 = ϑ
+ℶ𝛻 sin 𝜕𝛻 , 𝜛 =
+ℶ
+3 𝛻=1
+3 𝛻=1
+3 𝛻=1 𝛻
+
+(1)
+
+(2)
+
+⌉
+Let ε = ε2𝜍 + ε2𝜑 and ℷ ϖ ℸ⊳(3) the homogeneous transformation mapping the base frame to the tip. The rotation matrix and
+ε
+ε
+translation are (with ⊲ ε = cos , 0 ε = sin ):
+ℵ
+
+4 of 13
+
+ℵ
+
+ℵ
+
+ℵ
+
+⟨ ε𝜍 ε𝜑 ⦄
+⟨ ε𝜍 ⟩
+ε2𝜍 ⦄
+{
+⊲ε ϑ 1
+0ε
+}1 + ε2 ⊲ εℵ ϑ 1
+2
+ε ℵ⟪
+ε
+ℵ
+} ε ε
+⟪
+2
+ε ⦄
+⦄
+⟨
+⟨ ε𝜑 ⟪
+1 = } 𝜍 𝜑 ⊲ε ϑ 1 1 + 𝜑 ⊲ε ϑ 1
+ε
+0
+} ε2
+ε ℵ⟪
+ε2 ℵ
+ℵ
+}
+⟪
+ε
+ε
+𝜑
+𝜍
+}
+ϑ
+0ε
+ϑ
+0ε
+⊲ε ⟪
+ε ℵ
+ε ℵ
+ℵ
+⦃
+⟫
+⦄
+⟨
+⦄
+⟨
+T
+ℵ 𝜛 ε𝜍 1 ϑ ⊲ ε ε𝜑 1 ϑ ⊲ ε ε 0 ε
+❳
+2= 2 ❲
+ε
+ℵ
+ℵ
+ℵ
+
+(3a)
+
+(3b)
+
+We choose to express section rotations as Euler angles
+(3yaw , 𝜀pitch , 𝜗roll ) for their interpretability; gimbal lock cannot
+occur since torsional motion is impossible in these sections.
+
+Advanced Intelligent Systems, Year
+
+However, soft arms undergo deformations due to external forces
+and self-weight, requiring more complex shape approximations
+for full-body proprioception. We adopt the Piecewise Polynomial
+Curvature (PPC) model [31], which retains the 𝜔-parameters. It
+expresses the curvature ⊲(0) of the central axis of a segment as a
+polynomial in the normalized arc length 0 ϖ [0, 1], with the local
+0
+bending angle 𝜀(0) = ∱0 ⊲(4)ℵ4. For example, in the quadratic
+case:
+
+1
+1
+𝜀(0) = ⊲0 0 + ⊲1 02 + ⊲2 03
+(4)
+2
+3
+Let ℷ 0 ϖ ℸ⊳(3) denote the homogeneous transformation from the
+base frame to any point along the section axis (with ⊲𝜗 = cos 𝜗,
+0𝜗 = sin 𝜗, ⊲𝜀(0) = cos 𝜀(0), 0𝜀(0) = sin 𝜀(0)):
+2
+{⊲𝜗 (⊲𝜀(0) ϑ 1) + 1 0𝜗 ⊲𝜗 (⊲𝜀(0) ϑ 1) ⊲𝜗 0𝜀(0) ⟩
+0
+}
+1 = 0𝜗 ⊲𝜗 (⊲𝜀(0) ϑ 1) 0𝜗2 (⊲𝜀(0) ϑ 1) + 1 0𝜗 0𝜀(0) ⟪
+}
+⟪
+ϑ⊲𝜗 0𝜀(0)
+ϑ0𝜗 0𝜀(0)
+⊲𝜀(0) ⟫
+⦃
+/
+\T
+0
+0
+0
+20 = ⊲𝜗 ∱0 𝜛0𝜀(4) ℵ4 0𝜗 ∱0 𝜛0𝜀(4) ℵ4 ∱0 𝜛⊲𝜀(4) ℵ4
+
+3.1.1
+
+(5a)
+(5b)
+
+For capturing ground truth pose, re!ective markers for motion
+1
+capture are placed along each segment at intervals of of its
+3
+length. We refer to these bodies as subsections of the module. They
+provide ground-truth bending direction and angle estimates 𝜗5 0 ,
+1 2
+𝜀50 at 0 = , , 1 (details in the Supporting Information). We
+3 3
+adopt the optimization in [9], applied identically to quadratic,
+a$ne, and constant models. Coe$cients are initialized analytically from these measurements solving proper linear systems.
+Starting from these guesses, we optimize the coe$cients by minimizing the deviation between predicted and measured rotation
+matrices. Denoting by ( ⋜ (6 the Frobenius norm, the quadratic
+curvature parameters are:
+arg
+
+min
+
+⊲0 , ⊲1 , ⊲2 ϖℝ
+
+⌈ )
+2
+)) 10 (⊲0 , ⊲1 , ⊲2 ) ϑ 15 0 )))
+)
+)
+6
+1 2
+
+0= , ,1
+
+(6)
+
+The bending direction 𝜗 is the mean of 𝜗5 1 , 𝜗5 2 , 𝜗5 1 , while 𝜛 is the
+3
+3
+average tendon length according to Eq. 2.
+
+3
+3.1
+
+of sections requires adjusting only the #rst layer (Fig. 3a). At the
+end of the backbone, we apply Global Average Pooling (GAP)
+followed by a fully connected head that maps directly to the regression outputs. Let 8 denote the stacked images from the BW
+cameras. We denote by 9.1 and 9,1 the networks mapping 8 to the
+tip pose and full-body curvature parameters of the single-section
+arm, and 9.3 and 9,3 for the multi-section arm.
+Forward and inverse kinematics are modeled using a custom
+MLP architecture, detailed in Fig. 3b. The network utilizes residual blocks to prevent vanishing gradients, yielding the inverse
+mappings <ℶ1 ϱ 2 ↦→ ℶ and <ℶ3 ϱ . ↦→ ℶ, and the forward
+mapping <.3 ϱ ℶ ↦→ ..
+
+3 3
+
+Vision Based Reconstruction and Control
+Vision Based Proprioception
+
+To reconstruct the kinematics of the robot from the internal
+cameras, we use two deep learning architectures. The #rst is a
+Convolutional Neural Network (CNN) to estimate pose and curvature parameters directly from camera images. The second is
+a Multi-Layer Perceptron (MLP) for modeling the forward and
+inverse kinematics of both robotic arms.
+We use MobileNetV2 [32] as a pre-trained CNN backbone. This
+lightweight architecture reduces training e"ort, mitigates over#tting, and limits the sensing frequency to about 8 Hz, which is
+su$cient for quasi-static control. The input consists of stacked
+grayscale images from the cameras placed along the manipulator,
+with a shape of 480 ω 640 ω 7, where 7 denotes the number of
+sections of the soft arm. To process the image batches, the #rst 2D
+kernel is modi#ed and preceded by a normalization layer. This is
+the only non-pre-trained component of the feature extractor, making the sensing design scalable, as adapting to a di"erent number
+
+Network Training
+
+All networks were trained on an NVIDIA GeForce RTX 3090
+GPU. We used transfer learning within the same robot and across
+the two manipulators: 9,1 networks were initialized with the 9.1
+backbone, and 9.3 was initialized from 9.1 . To improve generalization, we applied online data augmentation simulating changes
+in illumination and brightness to account for residual variations
+through the di"usive skin. The dataset was split into training
+(85%), validation (10%), and test (5%) sets. Training employed the
+Adam optimizer with ℏ = 10ϑ3 , weight decay, and early stopping.
+We employed Huber loss (∲) to train all regressors to compensate
+for ground-truth noise and outliers [33].
+3.1.2
+
+Model Spatial Attention
+
+Inspired by [15], we adapt the Grad-CAM method [34] to visualize the image regions that most in!uence the prediction (details
+in the Supporting Information). As illustrated in Fig. 4a, the
+network generalizes by focusing primarily on structural deformations of the trimmed helicoid rather than the tip itself, which
+is not always fully visible. Speci#cally, in bent con#gurations,
+the network heavily relies on the elongated side opposite the
+bending direction while also exploiting the compressed side. In
+straight con#gurations, attention shifts toward the four corners
+where structural variations are strongest, enabling robust state
+estimation across both bending and compression. The average
+activation map con#rms this pattern, with consistent attention
+concentrated at the four corners across the dataset.
+
+3.2
+
+Workspace Sampling
+
+The CNN and MLP architectures require supervised training
+data spanning the workspaces of the manipulators. We collected
+10,000 data points for both single- and multi- section con#gurations using six Optitrack Prime 13 cameras and Motive software,
+covering bending angles up to 85⋛ per section.
+All pose information is transformed to the base origin reference frame (frames detailed in Fig. 1b), yielding a generic pose
+vector . = [2, >]T (position 2 = [𝜍, 𝜑, ⋆]T , orientation > =
+[3yaw , 𝜀pitch , 𝜗roll ]T ). Curvature parameters ,≨ for segment ≨ are
+de#ned in the local module base frame (e.g., ,≨ = [⊲0 , ⊲1 , ⊲2 , 𝜛, 𝜗]T≨
+for quadratic models). Tendon lengths for each section are denoted ℶ≨ = [ℶ1≨ , ℶ2≨ , ℶ3≨ ]T ; for the multi-segment case, ≨ ϖ
+{8, 88, 888}, forming the full actuation vector ℶ = [ℶ8 , ℶ88 , ℶ888 ]T . For
+each data point, we captured camera images, module poses (tip
+
+5 of 13
+
+a
+
+b
+
+c
+
+F I G U R E 4 | (a) Grad-CAM visualizations from 9.1 for di"erent bending con#gurations and average Grad-CAM over the test set. The network
+mostly focuses on deformations of the Trimmed Helicoid structure along the bending direction. (b) Di"erent null-space con#gurations yield the same
+tip pose. (c) High-level kinematic closed-loop controller employing CNN-based feedback. Tendons can be actuated using either model-based or datadriven approaches.
+
+pose ., and intermediate poses .1 , .2 for the multi-segment case),
+tendon lengths ℶ, and segment curvature parameters , = {,≨ }
+across quadratic, a$ne, and constant curvature models.
+While the single-section robot sampling utilized pure motor babbling, the multi-section arm requires a structured strategy to
+explore workspace boundaries where modules bend congruently.
+We adapted the strategy in [10] for a compressible robot by de#ning a Bending Solver 𝐴ℸ ϱ ℶ≨ ↦→ ℶ𝐵 to map tendon lengths
+between sections to achieve identical 𝜚-con#guration. The sampling procedure is statistically balanced: one-third of the samples
+actuate all modules to the same con#guration, one-third couple
+two modules while the remaining one is independent, and the
+#nal third utilizes full independent actuation.
+
+3.3
+
+Controller Design
+
+For the single-section robot, a controller is implemented to reach
+a desired position, while the pose is controlled for multi-section
+case. The multi-section arm is an overactuated system with nine
+distributed actuators and six control degrees of freedom. An
+example of the corresponding 3-DOF null space is shown in
+Fig. 4b demonstrating how di"erent structural con#gurations,
+whether compressed or bent, yield the same tip position and orientation. The manipulator can be shaped within its kinematics to
+exploit these equivalent states.
+All the designed kinematic controllers follow the same general
+scheme shown in Fig. 4c. A trajectory planner ∳ 𝐵 (where 𝐵 is the
+number of sections) generates a time-varying reference pose or
+position. The error between the reference and the current state,
+estimated in closed-loop by the CNN from real-time camera input,
+is then fed to an inverse kinematics (IK) solver. This updates the
+tendon actuations over time, driving the robot through its actual
+forward kinematics (FK), until the distance to the goal falls below
+a given threshold 𝐶.
+3.3.1
+
+Single-Section Controller
+
+The single-section controllers operate on a fully actuated system.
+At each time step, the system is locally linearized through its Jacobian to compute the tendon actuation required to reach 2>𝐷9 .
+For the model-based controller, vision-based sensing is combined
+
+6 of 13
+
+with encoder position feedback. Once ℶ is measured from the
+motor encoders, the forward derivative 𝐸 is computed as 𝐸22ℶ (ℶ).
+To mitigate poor conditioning, we employ its regularized inverse
+𝐸 # = 𝐸 ℷ (𝐸𝐸 ℷ + 𝐹2 8)ϑ1 , and compute the tendon displacement as
+𝜕ℶ = 𝐸 # ⋜ (2>𝐷9 ϑ 2). The damping parameter is set to 𝐹 = 0.1 and
+𝐶 to 3 mm.
+The data-driven controller computes the inverse mapping as:
+𝐺<ℶ1 ⦅
+⦅⦅
+(7)
+𝐺2 ⦅⦅2
+and avoids the use of encoders, enabling a fully self-contained
+vision-based pipeline at the cost of propagating camera estimation errors through the Jacobian. Conversely, combining both
+sensing modalities in the model-based controller improves accuracy by compensating for their respective limitations.
+In both cases, the trajectory from the current position 2 to the target 2𝐻𝐼𝐽ℶ is generated by a straight-line Cartesian path planner ∳ 1
+with waypoint spacing 𝐾 = 1 mm. The sequence is dynamically
+updated based on camera feedback. The same algorithms are also
+employed in open-loop control as a baseline, where robot states
+are internally updated through either model-based or data-driven
+forward kinematics.
+𝐸522ℶ =
+
+3.3.2
+
+Multi-Section Controller
+
+The multi-section continuum arm is inherently redundant. The
+proposed model-based null-space controller exploits the Jacobian
+to optimize secondary objectives within the null space associated
+with the pose task. The general resolved motion rate solution [19]
+is:
+ℶ𝐿 = 𝐸 # .𝐿 + <𝑀ℶ
+
+(8)
+
+𝑂 T (ℶ ϑ ℶ)
+𝑂
+𝑁(ℶ) = (ℶ ϑ ℶ)
+
+(9)
+
+where 𝐸 = 𝐸 (𝐸𝐸 + 𝐹 8) is the regularized Moore-Penrose
+pseudoinverse, and < = 8 ϑ 𝐸 # 𝐸 projects 𝑀ℶ onto the null space of
+𝐸. We minimize the quadratic cost function:
+#
+
+ℷ
+
+ℷ
+
+2
+
+ϑ1
+
+1
+2
+
+where ℶ𝑂 denotes the mean tendon actuation estimated from the
+dataset. Reducing the deviation from mid-range values keeps the
+manipulator away from its physical limits, preserving !exibility
+for future tasks, and promotes smooth, coordinated joint motions
+
+Advanced Intelligent Systems, Year
+
+a
+
+b
+
+Position
+
+Orientation
+
+c
+
+F I G U R E 5 | (a) Distribution of position (mm) and orientation (⋛ ) reconstruction errors for the single-section arm on the test set. (b) Single-section
+curvature reconstruction and bending angle error. Four test examples with increasing deformation are shown, with GT (ground-truth) reconstructions
+as solid and CNN predictions as dashed lines. Axes scaling is not uniform to emphasize the bending e"ect. The corresponding 𝜗 angular errors are
+highlighted in orange. (c) Performance of the proposed controllers on the control workspace of the single-segment arm, reporting both average errors
+and standard deviations.
+
+by distributing control e"ort evenly across the tendons. The secondary objective is enforced by adding the projected gradient of
+𝑁(ℶ) [35] to the control law:
+ℶ𝐿 = 𝐸 # .𝐿 ϑ < ⋜ ς𝑁 = 𝐸 # .𝐿 + <(ℶ𝑂 ϑ ℶ)
+
+(10)
+
+Set target .𝐻𝐼𝐽ℶ and convergence threshold 𝐶
+Measure current pose . from (9.3 (8))
+Measure tip positions [28 , 288 , 2888 ] from (9.3 (8))
+Estimate ℶ ← ℶ(28 , 288 , 2888 ) via PCC
+while ℵℸ⊳(3) (., .𝐻𝐼𝐽ℶ ) > 𝐶 do
+⦄
+⟨
+Compute next reference .>𝐷9 ← ∳ 3 (., .𝐻𝐼𝐽ℶ )
+1
+Measure ℶ from motor encoders
+Compute Jacobian 𝐸 ← 𝐸ℶ2. (ℶ)
+⦄
+⟨ϑ1
+Compute damped pseudoinverse 𝐸 # ← 𝐸 T 𝐸𝐸 T + 𝐹2 8
+Compute null-space projector < ← 8 ϑ 𝐸 # 𝐸
+Move motors by 𝜕ℶ ← 𝐸 # ⋜ (.>𝐷9 ϑ .) + < ⋜ (ℶ𝑂 ϑ ℶ)
+Measure . from (9.3 (8))
+end while
+
+Algorithm 1 Model-based feedback controller
+
+Trajectories between the current pose . and the target .𝐻𝐼𝐽ℶ
+are generated by an ℸ⊳(3) planner ∳ 3 , interpolating positions
+linearly and orientations via SLERP on the ℸ𝑃(3) manifold. Distance metrics [36] and parameters are detailed in the Supporting
+Information. The model-based controller is summarized in Alg. 1.
+Parameters 𝐹 and 𝐾 match the single-section values; the convergence threshold is set to 𝐶 = 10 mm, and the PCC-based Jacobian
+is estimated from encoders.
+Similarly, the proposed data-driven controller reduces the deviation of joint movements from their mid-range values. Redundancy optimization is incorporated during training through a
+
+Lagrange multiplier 𝑄 = 0.01, which balances primary and secondary tasks. The inverse kinematics function <ℶ3 (.) is learned
+via a two-stage scheme. First, a forward network <.3 (ℶ) is trained
+to map actuator commands to end-e"ector poses. This network
+is then frozen and used to supervise the training of the inverse
+mapping <ℶ3 (.). The loss combines a reconstruction error and a
+secondary objective:
+∲ = (. ϑ <.3 (<ℶ3 (.))(22 + 𝑄 ⋜ (ℶ𝑂 ϑ <ℶ3 (.)(22
+
+(11)
+
+The #rst term enforces task accuracy, while the second biases the
+solution toward ℶ.𝑂 The secondary objective can be !exibly modi#ed for alternative tasks such as obstacle avoidance or grasping.
+The data-driven controller is summarized in Alg. 2. As in the
+single-section case, the Jacobian is estimated directly from the
+pose without encoder feedback.
+
+Set target .𝐻𝐼𝐽ℶ and convergence threshold 𝐶
+Measure current pose . from (9.3 (8))
+while ℵℸ⊳(3) (., .𝐻𝐼𝐽ℶ ) > 𝐶 do
+⦄
+⟨
+Compute next reference .>𝐷9 ← ∳ 3 (., .𝐻𝐼𝐽ℶ )
+1
+𝐺<ℶ3 ⦅
+⦅⦅
+Compute 𝐸5.2ℶ ←
+𝐺. ⦅⦅.
+Move motors by 𝜕ℶ ← 𝐸5.2ℶ ⋜ (.>𝐷9 ϑ .)
+Measure . from (9.3 (8))
+end while
+
+Algorithm 2 Data-driven feedback controller
+
+7 of 13
+
+a
+
+b
+
+Model-based, closed-loop
+
+c
+
+Data-driven, closed-loop
+
+d
+
+Model-based, open-loop
+
+Data-driven, open-loop
+
+F I G U R E 6 | Trajectory tracking for the single-section soft manipulator. The dashed grey line indicates the reference trajectory; executed trajectories
+are shown in orange for the lower circle and blue for the upper one. (a) Model-based feedback controller. (b) Data-driven feedback controller. (c) Modelbased feedforward controller. (d) Data-driven feedforward controller.
+
+4
+
+Experimental Results
+
+We evaluate the proposed framework on both single- and multisection soft manipulators. First, we evaluate tip pose estimation and curvature reconstruction from embedded cameras with
+CNNs, considering quadratic, a$ne, and constant curvature
+models. We further assess the data-driven kinematics in comparison to the PCC approximation. Then, we benchmark the proposed model-based and data-driven controllers on target reaching and trajectory tracking, and demonstrate the advantages of
+closed-loop control under external disturbances.
+
+4.1
+
+Single-Segment Reconstruction and Control
+
+4.1.1
+
+Static Pose Reconstruction
+
+We embed a single camera at the base to estimate both tip position
+and orientation. The #nal position accuracy corresponds to 2.66±
+1.49% of the robot length (a translation error of 3.99 ± 2.23 mm),
+and the overall rotation error is 3.11⋛ ± 1.96⋛ . The reconstruction error distribution is reported in Fig. 5a. Overall, accuracy
+improves in bent con#gurations, where helicoidal deformations
+provide stronger visual cues for state estimation. Compared to
+IMU-based approaches [6], which have reported degradation at
+high bending, these results suggest that embedded vision may be
+advantageous at workspace boundaries.
+4.1.2
+
+Curvature Reconstruction
+
+The quadratic, a$ne, and constant curvature CNN models were
+5 𝜛,
+5 and the
+trained and tested independently, each predicting 𝜗,
+corresponding polynomial curvature parameters. Fig. 5b shows
+
+8 of 13
+
+a
+
+b
+
+F I G U R E 7 | Cumulative 3D reconstruction error of the curvature
+𝜛 2𝜛
+models. (a) Single-section arm: reference points at ,
+, and 𝜛. (b)
+3
+3
+Multi-section arm: reference points placed every ninth of the manipulator
+length. Error bars indicate ± one standard deviation. Note the di"erent
+vertical scales.
+
+four representative con#gurations with increasing deformation
+projected onto the bending plane. Ground-truth reconstructions
+are compared with predictions from the three curvature models. The corresponding 𝜗 angular errors are plotted against the
+backbone projection on the base plane. The discrepancy among
+the three ground-truth curvature models grows with deformation
+due to actuation non-idealities and self-weight. CNN predictions
+remain accurate even in boundary con#gurations. However, angular error in 𝜗 can reach nearly 180⋛ near straight con#gurations, where such precision is not needed for accurate reconstruction, as backbone error remains limited. As bending increases, 𝜗
+error decreases signi#cantly.
+To explore how the internal camera can be used for distributed
+proprioception, we evaluate reconstruction accuracy at three ref𝜛 2𝜛
+erence points on the backbone, respectively at , , and 𝜛. Fig. 7a
+3 3
+reports the average 3D error for each point, as well as the cumulative standard deviations across all curvature models. Although
+
+Advanced Intelligent Systems, Year
+
+a
+
+b
+
+Position
+
+Orientation
+
+F I G U R E 8 | (a) Distribution of position (mm) and orientation (⋛ ) reconstruction errors for the multi-section arm on the test set. (b) Performance
+of the four proposed controllers on the control workspace of the multi-segment arm, reporting average errors and standard deviations for translation
+and rotation accuracy.
+
+mean values are comparable, the standard deviation decreases
+with increasing model descriptiveness.
+4.1.3
+
+Data-Driven Kinematics
+
+The inverse kinematics network <ℶ1 provides a 3-to-3 mapping
+between tip position and actuation space. It achieves 0.86 ±
+1.12 mm tendon error, outperforming the PCC approximation
+(1.99 ± 1.85 mm).
+4.1.4
+
+Control Performance on Target Points
+
+Twenty workspace targets distributed via k-medoids clustering
+were reached sequentially by all controllers; each target was visited once, and errors are reported as the #nal position error at convergence. Results are shown in Fig. 5c. Closed-loop controllers
+approach the perception baseline: model-based and data-driven
+controllers yield 3.1 ± 0.8% and 5.0 ± 0.4% position error, respectively. The complementary behavior of vision (accurate at high
+bending) and encoder-based PCC (accurate near straight) leads
+to the best combined performance. The learning-based algorithm
+is more consistent but likely accumulates perception noise when
+evaluating the Jacobian directly from the estimated tip position.
+Conversely, the data-driven feedforward controller (7.3 ± 2.1%)
+outperforms its model-based counterpart (10.2 ± 7.9%) due to
+more accurate kinematics. Details on the 𝐵-medoids clustering
+algorithm, together with each closed-loop controller’s error distribution, are provided in the Supporting Information.
+4.1.5
+
+Control Performance on Trajectories
+
+Two circular trajectories (⋆ = 115, 125 mm; radii 35, 25 mm; 30
+waypoints each), at di"erent heights and dimensions to test bending and compression, were tracked by all controllers; results are
+shown in Fig. 6. Closed-loop controllers successfully reproduce
+
+both circles; the model-based approach drifts inward at high compression, while the data-driven controller achieves higher overall
+accuracy. Open-loop performance is lower: the model-based controller overestimates the radius, and the data-driven one is more
+irregular but reaches the target points more closely.
+
+4.2
+
+Multi-Segment Reconstruction and Control
+
+4.2.1
+
+Static Pose Reconstruction
+
+We embed three cameras at the base and at the interfaces between
+segments to estimate each section tip position and orientation.
+The pose errors estimated by the 9.3 CNN are reported in Table 1.
+Position error for Module I (2.96 ± 1.79% of section length) is
+consistent with the single-segment case. It accumulates along
+sections for Modules II and III, reaching 4.67 ± 2.93% and 5.88 ±
+3.66% up to the respective tips, while orientation remains below
+9⋛ .
+T A B L E 1 | Pose errors for the multi-section arm.
+Section
+I
+II
+III
+
+Position [mm]
+4.44 ± 2.68
+
+14.01 ± 8.79
+
+26.45 ± 16.49
+
+Orientation [°]
+6.78 ± 15.94
+6.45 ± 3.74
+
+8.74 ± 13.05
+
+The overall distribution of pose reconstruction errors on the test
+set across the three section tips is illustrated in Fig. 8a. The point
+clouds for all tips are overlaid in both perspective and frontal
+views. Errors near the base are smaller than at the distal end,
+with accuracy decreasing along sections due to chained frame
+transformations. Bent con#gurations, however, partially o"set
+accumulation by providing more distinctive image features.
+
+9 of 13
+
+a
+
+b
+
+Model-based, closed-loop
+
+c
+
+Data-driven, closed-loop
+
+d
+
+Model-based, open-loop
+
+Data-driven, open-loop
+
+F I G U R E 9 | Trajectory tracking for the multi-section soft manipulator. Angular values along both trajectories represent the rotation error on the
+corresponding circumferences, with smaller values on the inner circle and larger values on the outer one. (a) Model-based feedback controller. (b) Datadriven feedback controller. (c) Model-based feedforward controller. (d) Data-driven feedforward controller.
+
+4.2.2
+
+Curvature Reconstruction
+
+Three CNN models predict bending angles 𝜗5 1 , 𝜗5 2 , 𝜗5 3 , central axis
+lengths 𝜛5 1 , 𝜛5 2 , 𝜛5 3 , and the polynomial curvature parameters for
+each section. We evaluate reconstruction accuracy at nine uniformly spaced backbone reference points in Fig. 7b. Errors grow
+toward the distal tip; all models provide similar approximations,
+though increasing model complexity reduces variance.
+
+4.2.3
+
+Data-Driven Kinematics
+
+Forward kinematics accuracy is compared between the two approaches: the neural network (5.1 ± 3.3% position, 7.25 ± 3.88⋛
+rotation) outperforms PCC (8.9±6.0%, 21.47±23.05⋛ ) in both pose
+metrics. The composition <.3 (<ℶ3 (.)) yields 2.1 ± 1.2% translation
+and 8.3⋛ ± 5.4⋛ rotation error, though actual inversion accuracy
+combines this with the forward prediction error.
+
+4.2.5
+
+Control Performance on Trajectories
+
+Two circular trajectories with horizontal end-e"ector orientation
+(⋆ = 350, 380 mm; radii 120, 80 mm; 30 poses each) were tracked.
+The end-e"ector was kept horizontal as this pose is underrepresented in the training set and more challenging to generalize.
+Fig. 9 shows the results. Closed-loop controllers successfully reproduce both trajectories; the model-based approach tracks better
+in the circle plane, while the data-driven controller provides superior orientation and height stability. Open-loop controllers show
+larger errors and lower rotation accuracy. Compared to the singlesection case, feedforward accuracy is lower, as maintaining horizontal orientation requires precise multi-section coordination
+that is unreliable without feedback.
+4.2.6
+
+External Disturbances
+
+T A B L E 2 | Control performance comparison with external payload.
+
+4.2.4
+
+Control Performance on Target Points
+
+The same 𝐵-medoids algorithm used for the single-section
+arm de#ned 20 target poses. Control performance is shown in
+Fig. 8b. Closed-loop controllers achieve near-sensing accuracy;
+the model-based controller reaches 5.6 ± 2.5% position error and
+the data-driven one 6.1±2.6%, with di"erences linked to whether
+the Jacobian uses encoder or camera feedback. Open-loop performance degrades: PCC yields 7.1 ± 2.3% while the data-driven approach reaches 9.1 ± 1.2% due to compounding kinematic errors,
+though with superior orientation tracking and lower variance
+than the model-based open-loop controller.
+
+10 of 13
+
+Control
+Closed-loop
+Open-loop
+
+Translation error [mm]
+
+Rotation error [°]
+
+64.56 ± 15.96
+
+25.16 ± 9.25
+
+28.55 ± 14.40
+
+14.39 ± 6.28
+
+A 50 g payload (φ 40% of e"ective robot mass, including TPU
+body, fabric, cameras, and PLA interfaces) was attached to the
+tip, emulating a sustained tip contact force and serving as a proxy
+for evaluating closed-loop robustness under persistent external
+interactions. Given its superior performance in the unloaded
+
+Advanced Intelligent Systems, Year
+
+a
+
+b
+
+Closed-loop
+
+Open-loop
+
+F I G U R E 10 | Trajectory tracking for the multi-section robot under an external payload of 50 g attached at the tip, corresponding to about 40% of
+the e"ective mass of the manipulator. (a) Model-based feedback controller. (b) Model-based feedforward controller.
+
+experiments, the model-based controller was selected for this
+evaluation. Table 2 compares 20-target tracking error under load
+(error distribution in the Supporting Information). The closedloop controller maintains 6.3±3.2% translation error and rotation
+below 15⋛ , compared to 14.5 ± 3.5% and larger orientation deviations for open-loop. Fig. 10 shows trajectory tracking under
+disturbance: the closed-loop controller recovers from payloadinduced deviations even with a residual rotational bias, while
+open-loop control fails to maintain the desired path in both radius and height, becoming unbalanced toward the side of the
+o"-center weight attachment.
+
+5
+
+Conclusion and Discussion
+
+This work proposes a scalable framework for vision-based proprioception and control of soft continuum robotic arms. Miniature
+cameras embedded in each segment feed deep learning algorithms that reconstruct the full shape of the robot, enabling
+closed-loop control strategies, both model-based and data-driven,
+which explicitly exploit kinematic redundancy to accomplish
+secondary tasks within the null space.
+Utilizing two tendon-driven continuum manipulators, we propose a minimally invasive and compliance-preserving design using a !exible opaque covering that scales along the arm length
+without a"ecting its behavior. Experimental results demonstrate
+that our sensing approach reaches competitive performance in
+reconstructing both tip pose and full-body curvature, with preserved accuracy at workspace boundaries. Closed-loop control
+achieves near-sensing performance and outperforms open-loop
+alternatives, while being robust to external disturbances.
+This sensing and control framework endows soft robots with accurate motion capabilities. Leveraging their redundancy, continuum manipulators can accomplish complex tasks across multiple
+domains. For instance, they can be employed in search-andrescue or inspection within con#ned and cluttered environments,
+or in minimally invasive surgery. In such settings, full-body curvature feedback from embedded cameras enables null-space control
+to actively shape the arm for obstacle avoidance while maintaining the desired tip pose.
+This strategy has some limitations, which may be addressed in
+future work. At the sensing level, the embedded vision system
+currently relies on ambient lighting provided by the external
+environment. Illumination passes through the opaque covering,
+
+and variability is mitigated through image augmentations during
+training. To enable operation in poorly lit or nocturnal environments, the system should be extended with miniature internal
+light sources. This paper primarily investigates vision alone, integrating encoder signals for Jacobian estimation. Unlike external
+cameras, the internal setup avoids occlusion and #xed-placement
+constraints, at the cost of lower update frequency. The 8 Hz update rate limits the framework to quasi-static operation, suitable
+for applications such as inspection or surgical guidance; higher
+rates could be achieved by fusing camera estimates with encoder
+feedback through temporal #ltering. Future work should integrate the camera-based solution with alternative sensing strategies to improve con#guration accuracy. Moreover, the system
+does not detect contact or force information, although cameras
+could provide both. Extending proprioception to capture surface
+interactions through training or simulation would enhance robot
+capability, while force detection would add a feedback channel
+for closed-loop control in dynamic conditions. On the control
+side, future work will extend null-space control to additional secondary objectives. In this paper, redundancy was exploited to
+balance tendon e"ort, but the same methodology applies to shaping arm con#gurations for obstacle avoidance while tracking a
+desired end-e"ector trajectory. Furthermore, null-space control
+could be leveraged to wrap around objects and enable grasping,
+using curvature feedback to regulate how the robot conforms to
+complex geometries.
+
+Author Contributions
+Conceptualization: L.V., G.P., and J.H. Methodology: L.V. Investigation: L.V. Writing: L.V. and J.H. Review and editing:
+L.V., F.B., and J.H. Supervision: G.P., F.B., and J.H.
+
+Acknowledgments
+This work was supported by the Swiss-European Mobility Programme (SEMP).
+
+Con"icts of Interest
+The authors declare no con!icts of interest.
+
+Data Availability Statement
+The code supporting this study is openly available at
+https://github.com/CREATE-Lab-EPFL/VisionSoftControl.git.
+
+11 of 13
+
+The dataset is available on Zenodo at https://doi.org/10.5281/
+zenodo.20138549.
+
+References
+1. Cosimo Della Santina, Christian Duriez,, and Daniela Rus.
+“Model Based Control of Soft Robots: A Survey of the State of the
+Art and Open Challenges.” IEEE Control Syst. 43, no. 3 (2023):
+30–65.
+2. Cosimo Della Santina, Matteo Bianchi, Giorgio Grioli, Franco
+Angelini, Manuel Catalano, Manolo Garabini,, and Antonio Bicchi. “Controlling Soft Robots: Balancing Feedback and Feedforward Elements.” IEEE Robot. Automat. Mag. 24, no. 3 (2017):
+75–83.
+3. Ketao Zhang, Chen Qiu,, and Jian S. Dai. “An Extensible Continuum Robot With Integrated Origami Parallel Modules.” Journal
+of Mechanisms and Robotics 8, no. 3 (2016): 031010.
+4. Ruoyu Wang, Shiheng Wang, Songyu Du, Erdong Xiao, Wenzhen Yuan,, and Chen Feng. “Real-Time Soft Body 3D Proprioception via Deep Vision-Based Sensing.” IEEE Robot. Autom.
+Lett. 5, no. 2 (2020): 3382–3389.
+5. Chidanand Hegde, Jiangtao Su, Joel Ming Rui Tan, Ke He, Xiaodong Chen,, and Shlomo Magdassi. “Sensing in Soft Robotics.”
+ACS Nano 17, no. 16 (2023): 15277–15307.
+6. Guanran Pei, Francesco Stella, Omar Meebed, Zhenshan Bing,
+Cosimo Della Santina,, and Josie Hughes. 2024. “IMU Based
+Pose Reconstruction and Closed-loop Control for Soft Robotic
+Arms.” In 2024 IEEE/RSJ International Conference on Intelligent
+Robots and Systems (IROS), 1847–1852. IEEE.
+7. Elijah Almanzor, Fan Ye, Jialei Shi, Thomas George Thuruthel,
+Helge A. Wurdemann,, and Fumiya Iida. “Static Shape Control
+of Soft Continuum Robots Using Deep Visual Inverse Kinematic
+Models.” IEEE Trans. Robot. 39, no. 4 (2023): 2973–2988.
+8. Peiyi Wang, Zhexin Xie, Wenci Xin, Zhiqiang Tang, Xinhua
+Yang, Muralidharan Mohanakrishnan, Sheng Guo,, and Cecilia
+Laschi. “Sensing Expectation Enables Simultaneous Proprioception and Contact Detection in an Intelligent Soft Continuum
+Robot.” Nat Commun 15, no. 1 (2024): 9978.
+9. Guanran Pei, and Josie Hughes. 2025. “Polynomial Curvature
+Model for IMU-Based Proprioception in Soft Robotic Manipulators Under External Forces.” In 2025 IEEE 8th International
+Conference on Soft Robotics (RoboSoft), 1–7. IEEE.
+10. Zixi Chen, Qinghua Guan, Josie Hughes, Arianna Menciassi,,
+and Cesare Stefanini. “A Versatile Neural Network Con#guration Space Planning and Control Strategy for Modular Soft Robot
+Arms.” IEEE Trans. Robot.41 (2025): 4269–4282.
+11. Tuan Nguyen, Quan Luu, Dinh Nguyen,, and Van Ho. 2024.
+“ConTac: Continuum-Emulated Soft Skinned Arm with Visionbased Shape Sensing and Contact-aware Manipulation.” In
+Robotics: Science and Systems XX, Robotics: Science and Systems
+Foundation.
+12. Hehui Zheng, Sebastian Pinzello, Barnabas Gavin Cangan,
+Thomas J. K. Buchner,, and Robert K. Katzschmann. “VisionBased Online Key Point Estimation of Deformable Robots.”
+Advanced Intelligent Systems 6, no. 10 (2024): 2400105.
+13. Huanbo Sun, Katherine J. Kuchenbecker,, and Georg Martius.
+“A Soft Thumb-Sized Vision-Based Sensor with Accurate AllRound Force Perception.” Nat Mach Intell 4, no. 2 (2022): 135–
+145.
+14. Nathan F. Lepora, Yijiong Lin, Ben Money-Coomes,, and John
+Lloyd. “DigiTac: A DIGIT-TacTip Hybrid Tactile Sensor for Comparing Low-Cost High-Resolution Robot Touch.” IEEE Robot.
+Autom. Lett. 7, no. 4 (2022): 9382–9388.
+15. Uksang Yoo, Hanwen Zhao, Alvaro Altamirano, Wenzhen Yuan,,
+and Chen Feng. 2023. “Toward Zero-Shot Sim-to-Real Transfer
+Learning for Pneumatic Soft Robot 3D Proprioceptive Sensing.”
+In 2023 IEEE International Conference on Robotics and Automation (ICRA), 544–551. IEEE.
+
+12 of 13
+
+16. Ning Guo, Xudong Han, Shuqiao Zhong, Zhiyuan Zhou, Jian
+Lin, Jian S. Dai, Fang Wan,, and Chaoyang Song. “Proprioceptive State Estimation for Amphibious Tactile Sensing.” IEEE
+Trans. Robot.40 (2024): 4662–4676.
+17. Nathan F. Lepora, and John Lloyd. “Pose-Based Tactile Servoing: Controlled Soft Touch Using Deep Learning.” IEEE Robot.
+Automat. Mag. 28, no. 4 (2021): 43–55.
+18. Annan Zhang, Ryan L. Truby, Lillian Chin, Shuguang Li,, and
+Daniela Rus. “Vision-Based Sensing for Electrically-Driven
+Soft Actuators.” IEEE Robot. Autom. Lett. 7, no. 4 (2022): 11509–
+11516.
+19. Jun Nakanishi, Rick Cory, Michael Mistry, Jan Peters,, and Stefan Schaal. “Operational Space Control: A Theoretical and
+Empirical Comparison.” The International Journal of Robotics
+Research 27, no. 6 (2008): 737–757.
+20. Brandon H. Meng, Isuru S. Godage,, and Iyad Kanj. “RRT*Based Path Planning for Continuum Arms.” IEEE Robot. Autom.
+Lett. 7, no. 3 (2022): 6830–6837.
+21. Apoorva D. Kapadia, Ian. D. Walker,, and Enver Tatlicioglu. 2012.
+“Teleoperation Control of a Redundant Continuum Manipulator
+Using a Non-Redundant Rigid-Link Master.” In 2012 IEEE/RSJ
+International Conference on Intelligent Robots and Systems, 3105–
+3110. IEEE.
+22. Apoorva Kapadia, and Ian D. Walker. 2011. “Task-Space Control of Extensible Continuum Manipulators.” In 2011 IEEE/RSJ
+International Conference on Intelligent Robots and Systems, 1087–
+1092. IEEE.
+23. Junius Santoso, and Cagdas D. Onal. “An Origami Continuum
+Robot Capable of Precise Motion Through Torsionally Sti" Body
+and Smooth Inverse Kinematics.” Soft Robotics 8, no. 4 (2021):
+371–386.
+24. Cosimo Della Santina, Robert K. Katzschmann, Antonio Biechi,,
+and Daniela Rus. 2018. “Dynamic Control of Soft Robots Interacting with the Environment.” In 2018 IEEE International
+Conference on Soft Robotics (RoboSoft), 46–53. IEEE.
+25. B.A. Jones, and I.D. Walker.
+“Kinematics for Multisection
+Continuum Robots.” IEEE Trans. Robot. 22, no. 1 (2006): 43–55.
+26. Federico Renda, Frederic Boyer, Jorge Dias,, and Lakmal Seneviratne.
+“Discrete Cosserat Approach for Multisection Soft
+Manipulator Dynamics.” IEEE Trans. Robot. 34, no. 6 (2018):
+1518–1533.
+27. E. Coevoet, T. Morales-Bieze, F. Largilliere, Z. Zhang, M. Thieffry, M. Sanz-Lopez, B. Carrez, D. Marchal, O. Goury, J. Dequidt,,
+and C. Duriez. “Software Toolkit for Modeling, Simulation,
+and Control of Soft Robots.” Advanced Robotics 31, no. 22 (2017):
+1208–1224.
+28. Niccolò Enrico Veronese, Alessandro Albini, Yao Yao, Paolo
+Rocco, Perla Maiolino,, and Fulvio Forni. 2024. “On Feedback Error Learning for Adaptive Soft Robot Control.” In 2024
+IEEE 7th International Conference on Soft Robotics (RoboSoft),
+793–799. IEEE.
+29. Qinghua Guan, Francesco Stella, Cosimo Della Santina, Jinsong
+Leng,, and Josie Hughes. “Trimmed Helicoids: An Architectured Soft Structure Yielding Soft Robots with High Precision,
+Large Workspace, and Compliant Interactions.” npj Robot 1, no.
+1 (2023): 4.
+30. Cosimo Della Santina, Antonio Bicchi,, and Daniela Rus. “On an
+Improved State Parametrization for Soft Robots With Piecewise
+Constant Curvature and Its Use in Model Based Control.” IEEE
+Robot. Autom. Lett. 5, no. 2 (2020): 1001–1008.
+31. Francesco Stella, Qinghua Guan, Cosimo Della Santina,, and
+Josie Hughes. 2023. “Piecewise A$ne Curvature Model: A
+Reduced-Order Model for Soft Robot-Environment Interaction
+Beyond PCC.” In 2023 IEEE International Conference on Soft
+Robotics (RoboSoft), 1–7. IEEE.
+32. Mark Sandler, Andrew Howard, Menglong Zhu, Andrey Zhmoginov,, and Liang-Chieh Chen. 2018. “MobileNetV2: Inverted Residuals and Linear Bottlenecks.” In 2018 IEEE/CVF
+
+Advanced Intelligent Systems, Year
+
+33.
+
+34.
+
+35.
+36.
+
+Conference on Computer Vision and Pattern Recognition, 4510–
+4520. IEEE.
+Gregory P. Meyer 2021. “An Alternative Probabilistic Interpretation of the Huber Loss.” In 2021 IEEE/CVF Conference on
+Computer Vision and Pattern Recognition (CVPR), 5257–5265.
+IEEE.
+Ramprasaath R Selvaraju, Michael Cogswell, Abhishek Das, Ramakrishna Vedantam, Devi Parikh,, and Dhruv Batra. “GradCAM: Visual Explanations From Deep Networks via GradientBased Localization.” . International Journal of Computer Vision.
+Alain Liégeois. “Automatic Supervisory Control of the Con#guration and Behavior of Multibody Mechanisms.” IEEE Trans.
+Syst., Man, Cybern. 7, no. 12 (1977): 868–871.
+Ra"aele Di Gregorio. “Metrics Proposed for Measuring the Distance between Two Rigid-Body Poses: Review, Comparison, and
+Combination.” Robotica 42, no. 1 (2024): 302–318.
+
+Supporting Information
+Additional supporting information can be found online in the
+Supporting Information section.
+
+13 of 13
+
+

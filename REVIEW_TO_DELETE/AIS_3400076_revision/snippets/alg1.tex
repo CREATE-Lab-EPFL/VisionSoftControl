@@ -1,0 +1,19 @@
+\begin{algorithm}[t]
+\caption{Model-based feedback controller}
+\begin{algorithmic}
+\State Set target $\mathbf{p}_{\mathrm{targ}}$ and convergence threshold $\gamma$
+\State Measure current pose $\mathbf{p}$ from $f_p^3(\mathbf{I})$
+\State Measure tip positions $[\mathbf{t}_{\mathrm{I}}, \mathbf{t}_{\mathrm{II}}, \mathbf{t}_{\mathrm{III}}]$ from $f_p^3(\mathbf{I})$
+\State Estimate $\mathbf{l}_0 \gets \mathbf{l}(\mathbf{t}_{\mathrm{I}}, \mathbf{t}_{\mathrm{II}}, \mathbf{t}_{\mathrm{III}})$ via PCC
+\State Set encoder offset $\mathbf{l}_{\mathrm{off}} \gets \mathbf{l}_{\mathrm{enc}} - \mathbf{l}_0$
+\While{$d_{SE(3)}(\mathbf{p}, \mathbf{p}_{\mathrm{targ}}) > \gamma$}
+\State Compute next reference $\mathbf{p}_{\mathrm{ref}} \gets W^3(\mathbf{p}, \mathbf{p}_{\mathrm{targ}})$
+\State Measure $\mathbf{l} \gets \mathbf{l}_{\mathrm{enc}} - \mathbf{l}_{\mathrm{off}}$ from motor encoders
+\State Compute Jacobian $\mathbf{J} \gets \mathbf{J}_{l \to p}(\mathbf{l})$
+\State Compute damped pseudoinverse $\mathbf{J}^{\#} \gets \mathbf{J}^T (\mathbf{J}\mathbf{J}^T + \lambda^2 \mathbf{I})^{-1}$
+\State Compute null-space projector $\mathbf{N} \gets \mathbf{I} - \mathbf{J}^{\#}\mathbf{J}$
+\State Move motors by $\delta\mathbf{l} \gets \mathbf{J}^{\#}(\mathbf{p}_{\mathrm{ref}} - \mathbf{p}) + \mathbf{N}(\bar{\mathbf{l}} - \mathbf{l})$
+\State Measure $\mathbf{p}$ from $f_p^3(\mathbf{I})$
+\EndWhile
+\end{algorithmic}
+\end{algorithm}
