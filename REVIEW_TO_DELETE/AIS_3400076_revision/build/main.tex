@@ -45,7 +45,7 @@
 \begin{enumerate}
 \item Work through the numbered \textbf{Steps}. Each gives \emph{where} (manuscript or SI, section, paragraph), the current text to \textbf{find} as printed in the submitted PDF, and the LaTeX to paste in a yellow box.
 \item Select the text in a yellow box and copy it (the pages have no numbers, so a box that continues on the next page also copies cleanly). Every box is also a file in \texttt{snippets/} with the name shown in its title; copying from the file is the safest option.
-\item Green boxes are the response-letter text for each comment. They are already assembled, with the reviewer quotes, in \texttt{snippets/response\_letter.tex}, which compiles as is; \texttt{response\_letter.pdf} is the compiled version.
+\item Green boxes are the response-letter text for each comment. They are already assembled, with the reviewer quotes, in \texttt{snippets/response\_letter.tex}, which compiles as is; \texttt{AIS\_3400076\_response\_letter.pdf} is the compiled version.
 \item Grey boxes quote the reviewer, blue boxes say what to do, and red boxes are notes for you only. \FILL{...} marks information only you have; search the snippets for \texttt{[FILL} and \texttt{[CONFIRM]} before submission.
 \item Mark the changes in the revised manuscript (the editor may ask for it), e.g.\ by wrapping each pasted text in \verb|\textcolor{blue}{...}|.
 \end{enumerate}
@@ -64,14 +64,11 @@
 \end{itemize}
 Each notebook saves its PDFs in the \texttt{results/} folder of its arm.
 
-\textbf{Files} (in \texttt{REVIEW\_TO\_DELETE/AIS\_3400076\_revision/} of the repository):
+\textbf{Files} (in \texttt{REVIEW\_TO\_DELETE/} of the repository): this guide, \texttt{AIS\_3400076\_response\_letter.pdf}, the original review PDFs, and \texttt{AIS\_3400076\_revision/} with the sources:
 \begin{itemize}
-\item \texttt{snippets/}: every LaTeX box and the response letter.
-\item \texttt{figures\_for\_SI/}: copies of the notebook outputs used by the new SI figures, already named as in the snippets.
-\item \texttt{figures/}: earlier drafts of the proposed figures (superseded by the notebook outputs).
-\item \texttt{crops/}: annotated crops of the current figures.
-\item \texttt{scripts/} and \texttt{data/}: every analysis and its output.
-\item \texttt{originals/}: the review material moved out of the repository.
+\item \texttt{snippets/}: every LaTeX box, and \texttt{response\_letter.tex}.
+\item \texttt{build/main.tex} and \texttt{crops/}: source of this guide.
+\item \texttt{scripts/} and \texttt{data/}: the analyses behind the numbers and tables; \texttt{scripts/snippets.py} regenerates the snippets.
 \end{itemize}
 
 \subsection*{Checklist: every comment and where it is handled}
@@ -302,7 +299,7 @@ Ready to use: \texttt{SINGLE/results/figS4\_matched\_ids.pdf} (\texttt{SINGLE\_r
 \snip{figS6_caption}
 
 \subsection{New SI figures S7--S9}\label{sec:fnew}
-All three go at the end of the SI (\st{st:siend}). Copy the folder \texttt{figures\_for\_SI/} next to the SI source, since the snippets use these file names; the files are copies of the notebook outputs (\texttt{MULTI/results/bending\_error.pdf}, \texttt{nullspace\_ablation.pdf}, \texttt{ik\_ablation.pdf}, \texttt{SINGLE/results/single\_workspace\_coverage.pdf}, \texttt{MULTI/results/multi\_workspace\_coverage.pdf}). Fig.~S7: error vs.\ bending; Fig.~S8: secondary-objective ablation (top: model-based, from the repository; bottom: data-driven, new); Fig.~S9: coverage (repository figures, shown in Section~\ref{sec:results}).
+All three go at the end of the SI (\st{st:siend}). Copy these notebook outputs next to the SI source, since the snippets use these file names: \texttt{MULTI/results/bending\_error.pdf}, \texttt{nullspace\_ablation.pdf}, \texttt{ik\_ablation.pdf}, \texttt{multi\_workspace\_coverage.pdf}, and \texttt{SINGLE/results/single\_workspace\_coverage.pdf}. Fig.~S7: error vs.\ bending; Fig.~S8: secondary-objective ablation (top: model-based, from the repository; bottom: data-driven, new); Fig.~S9: coverage (repository figures, shown in Section~\ref{sec:results}).
 \fig[0.95\linewidth]{../../../MULTI/results/bending_error.pdf}
 \fig[0.75\linewidth]{../../../MULTI/results/nullspace_ablation.pdf}
 \fig[0.75\linewidth]{../../../MULTI/results/ik_ablation.pdf}
@@ -761,7 +758,7 @@ The opening of the letter (overall assessment) and the responses whose changes a
 \begin{enumerate}
 \item Tables: \texttt{tab\_S7\_paths}, \texttt{tab\_S8\_targets\_single}, \texttt{tab\_S9\_targets\_multi}, \texttt{tab\_S10\_comparison}, \texttt{tab\_S11\_repro}, \texttt{tab\_S12\_composition}, \texttt{tab\_S13\_ablation}, \texttt{tab\_S14\_overlap}.
 \item Figures: \texttt{figS7\_bending}, \texttt{figS8\_ablation}, \texttt{figS9}.
-\item Copy \texttt{figures\_for\_SI/*.pdf} next to the SI source.
+\item Copy the five figure PDFs listed in Section~\ref{sec:fnew} (from \texttt{MULTI/results/} and \texttt{SINGLE/results/}) next to the SI source.
 \item The SI needs \texttt{booktabs} and \texttt{array} (or replace the rules with \verb|\hline|) and the four new bibliography entries.
 \end{enumerate}
 \step{Response letter: compile \texttt{snippets/response\_letter.tex}, fill the \texttt{[FILL]} and \texttt{[CONFIRM]} items, and adjust the tone.}

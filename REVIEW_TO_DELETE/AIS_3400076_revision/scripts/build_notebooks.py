@@ -8,7 +8,9 @@ from nbclient import NotebookClient
 REPO = "/home/vigno0405/github/VisionSoftControl"
 md, code = nbf.v4.new_markdown_cell, nbf.v4.new_code_cell
 
-HELPERS = r'''import glob, json, os, random
+HELPERS = r'''import warnings
+warnings.filterwarnings("ignore", message=".*torch.jit.load.*is deprecated")
+import glob, json, os, random
 import numpy as np
 import torch
 import matplotlib.pyplot as plt
