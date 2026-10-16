@@ -136,23 +136,27 @@ Fig.~S7 relates the tip position error on the test sets to the bending angle. Fo
 
 # ============================ PART 2: COMPARISON ============================
 S("tab_S10_comparison", r"""
-\begin{table*}[h]
+\begin{table*}[t]
 \centering
-\footnotesize
-\caption{Comparison with closely related systems.}
+\caption{Comparison of Embedded Sensing and Closed-Loop Control in Soft and Continuum Arms}
 \label{tab:S10_comparison}
-\begin{tabular}{*{7}{>{\raggedright\arraybackslash}p{2.1cm}}}
-\toprule
-Work & Sensing & Robot & Estimated & Closed loop on the estimate & Redundancy resolution & Accuracy, rate \\
-\midrule
-Hofer et al.~\cite{hoferVisionBasedSensingApproach2021} & One internal camera per bellow (3), painted interior pattern, LED illumination & Pneumatic fabric spherical arm, 2 rotational DoF & Orientation (2 angles) & Yes, cascaded PI on the camera estimate & Actuation redundancy not exploited & $\approx 1^\circ$, 30~Hz \\
-Thuruthel et al.~\cite{thuruthelLearningClosedLoop2017} & End-effector position feedback & Tendon-driven continuum manipulator, 6 DoF & Tip position & Yes, learned inverse kinematics with feedback; with and without external loads & Implicit in the learned inverse kinematics & -- \\
-Han et al.~\cite{hanAnchoringMorphologicalRepresentations2025} & One internal camera tracking an anchor marker & Soft metastructure modules & Anchor motion, force, full-body shape & Not demonstrated & -- & -- \\
-Lu et al.~\cite{luAdaptiveOnlineLearning2024} & Fiber Bragg grating & Robotic colonoscope; multi-section extensible soft manipulators & 3D shape & Yes, adaptive online-learning shape servoing & -- & -- \\
-Yoo et al.~\cite{REF15} & Internal camera; model trained in simulation & Pneumatic soft actuator (100~mm) & 3D shape & No & -- & 10.12~mm tip error \\
-This work & One internal camera per section, no internal markers or patterns & Tendon-driven Trimmed Helicoid arm, 1 and 3 sections & Section-tip poses (6 DoF), PPC curvature & Yes, model-based (PCC Jacobian) and data-driven (learned inverse kinematics) & Null-space objective; secondary term in IK training & 3.99~mm, $3.11^\circ$ (1 section); $\approx 8$~Hz \\
-\bottomrule
-\end{tabular}
+\footnotesize
+\setlength{\tabcolsep}{5pt}
+\renewcommand{\arraystretch}{1.18}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{4.0cm} >{\raggedright\arraybackslash}X >{\raggedright\arraybackslash}X >{\raggedright\arraybackslash}X >{\raggedright\arraybackslash}X >{\raggedright\arraybackslash}X@{}}
+\hline
+\textbf{Approach} & \textbf{Sensing} & \textbf{Sensed along the arm} & \textbf{Estimated} & \textbf{Closed loop on the estimate} & \textbf{Redundancy}\\
+\hline
+Sim-to-real sensing~\cite{REF15} & internal camera & one actuator & shape & --- & ---\\
+Anchored proprioception~\cite{hanAnchoringMorphologicalRepresentations2025} & internal camera, marker & one module & motion, force, shape & --- & ---\\
+Spherical soft arm~\cite{hoferVisionBasedSensingApproach2021} & internal cameras, pattern, LEDs & one joint & orientation & PI & not exploited\\
+Learned closed-loop IK~\cite{thuruthelLearningClosedLoop2017} & tip sensing & tip & tip position & learned IK & implicit\\
+FBG shape servoing~\cite{luAdaptiveOnlineLearning2024} & FBG & whole body & shape & adaptive & ---\\
+\hline
+\textbf{Distributed vision with redundancy-aware control (ours)} & \textbf{internal cameras only} & \textbf{every section} & \textbf{tip poses, shape} & \textbf{model-based; learned IK} & \textbf{null space; IK training loss}\\
+\hline
+\end{tabularx}\\[2pt]
+\parbox{\linewidth}{\footnotesize IK: inverse kinematics; PI: proportional--integral; FBG: fiber Bragg grating; ---: not addressed.}
 \end{table*}
 """)
 S("intro_comparison", r"""
@@ -241,7 +245,7 @@ S("concl_lighting", r"""
 Illumination passes through the opaque covering; image augmentations were applied during training to account for residual brightness variations, but robustness to changes in lighting or hardware was not tested.
 """)
 S("concl_limits_add", r"""
-The control evaluation used 20 targets, each visited once, and planar circular trajectories; repeated trials, non-planar and workspace-boundary trajectories, and further load magnitudes and directions remain to be tested. The training, validation, and test sets were drawn from the same acquisition sessions, so session-blocked evaluation is also left to future work. The secondary objectives were evaluated offline through the kinematic models (SI Section~5.3) rather than in hardware experiments.
+The control evaluation used 20 targets, each visited once, and planar circular trajectories; repeated trials, non-planar and workspace-boundary trajectories, larger length changes, and further load magnitudes and directions remain to be tested. The training, validation, and test sets were drawn from the same acquisition sessions, so session-blocked evaluation is also left to future work. The secondary objectives were evaluated offline through the kinematic models (SI Section~5.3) rather than in hardware experiments.
 """)
 S("concl_effort", r"""
 In this paper, redundancy was exploited to keep the tendon lengths centered in their actuation range, but the same methodology applies to shaping arm configurations for obstacle avoidance while tracking a desired end-effector trajectory.
@@ -452,6 +456,9 @@ An offline ablation of the secondary objectives of both controllers is reported 
 S("sec426_payload", r"""
 A 50~g payload ($\approx 40\%$ of effective robot mass, including TPU body, fabric, cameras, and PLA interfaces) was attached to the tip, emulating a sustained tip contact force. This single constant-load condition demonstrates the compensation of this load by the closed-loop controller; it does not establish robustness to general disturbances or contact.
 """)
+S("sec426_pct", r"""
+The closed-loop controller maintains $6.3 \pm 3.2\%$ translation error (relative to the 450~mm arm length) and rotation below $15^\circ$, compared to $14.5 \pm 3.5\%$ and larger orientation deviations for open-loop.
+""")
 S("sec414_targets", r"""
 Twenty workspace targets distributed via $k$-medoids clustering were reached sequentially by all controllers; each target was visited once, and errors are reported as the final position error at convergence, relative to the 150~mm section length for percentages. The standard deviations therefore describe the variation across targets, not trial-to-trial repeatability. Results are shown in Fig.~5c.
 """)
@@ -517,8 +524,11 @@ S("si61_outliers", r"""
 The distributions in Table~1 and Table~S6 are skewed by a small number of samples. Ten of the 500 test samples (2\%) have an orientation error above $30^\circ$ at one or more tips. Nine of them form three groups of three consecutive samples, i.e., three commanded configurations each recorded three times, and their motion-capture orientation labels imply section bending angles of $87^\circ$--$174^\circ$, far beyond the sampled range (95th percentile $\approx 30^\circ$--$34^\circ$); this is consistent with orientation flips of the tracked rigid bodies rather than with errors of the network. Excluding these 10 samples, the relative position error of Section~II is $""" + f"{wo['II']['pos_mean']:.2f} \\pm {wo['II']['pos_std']:.2f}" + r"""$~mm (instead of $11.92 \pm 25.10$~mm) and its orientation error $""" + f"{wo['II']['rot_mean']:.2f}^\\circ \\pm {wo['II']['rot_std']:.2f}^\\circ" + r"""$, and the orientation error of Section~I is $""" + f"{wo['I']['rot_mean']:.2f}^\\circ \\pm {wo['I']['rot_std']:.2f}^\\circ" + r"""$ (instead of $6.78^\circ \pm 15.94^\circ$).
 """)
 cS, cM = misc["coverage"]["SINGLE"], misc["coverage"]["MULTI"]
+dS, dM = [t["dL_mm"] for t in cS["targets"]], [x for t in cM["targets"] for x in t["dL_mm"]]
+LEN_S, LEN_M = f"${min(dS):.1f}$ to ${max(dS):.1f}$~mm", f"${min(dM):.1f}$ to ${max(dM):.1f}$~mm"
+TR_S = f"${cS['train_dL']['p5']:.1f}$ to ${cS['train_dL']['p95']:.1f}$~mm"
 S("si63_coverage", r"""
-Before clustering, the sampled workspace is restricted to points above $z = """ + f"{cS['z_filter_mm']}" + r"""$~mm for the single-section arm and $z = """ + f"{cM['z_filter_mm']}" + r"""$~mm for the multi-section arm (""" + f"{100 * cS['frac_ws_above_filter']:.1f}" + r"""\% and """ + f"{100 * cM['frac_ws_above_filter']:.1f}" + r"""\% of the samples), and each cluster center is replaced by the nearest sampled point. The resulting targets are listed in Tables~S8 and S9. The convex hull of the 20 targets covers """ + f"{100 * cS['hull_volume_ratio']:.1f}" + r"""\% (single section) and """ + f"{100 * cM['hull_volume_ratio']:.1f}" + r"""\% (multi-section) of the volume of the convex hull of the sampled positions, and the median distance from a sampled position to the nearest target is """ + f"{cS['median_dist_ws_to_nearest_target']:.1f}" + r"""~mm and """ + f"{cM['median_dist_ws_to_nearest_target']:.1f}" + r"""~mm, respectively. For the single-section arm, the targets reach a bending angle of $""" + f"{cS['target_bend_max']:.1f}" + r"""^\circ$ and the trajectories $""" + f"{cS['traj_bend_max']:.1f}" + r"""^\circ$, compared with a 95th percentile of $""" + f"{cS['train_bend']['p95']:.1f}" + r"""^\circ$ in the training data (Fig.~S9).
+Before clustering, the sampled workspace is restricted to points above $z = """ + f"{cS['z_filter_mm']}" + r"""$~mm for the single-section arm and $z = """ + f"{cM['z_filter_mm']}" + r"""$~mm for the multi-section arm (""" + f"{100 * cS['frac_ws_above_filter']:.1f}" + r"""\% and """ + f"{100 * cM['frac_ws_above_filter']:.1f}" + r"""\% of the samples), and each cluster center is replaced by the nearest sampled point. The resulting targets are listed in Tables~S8 and S9. The convex hull of the 20 targets covers """ + f"{100 * cS['hull_volume_ratio']:.1f}" + r"""\% (single section) and """ + f"{100 * cM['hull_volume_ratio']:.1f}" + r"""\% (multi-section) of the volume of the convex hull of the sampled positions, and the median distance from a sampled position to the nearest target is """ + f"{cS['median_dist_ws_to_nearest_target']:.1f}" + r"""~mm and """ + f"{cM['median_dist_ws_to_nearest_target']:.1f}" + r"""~mm, respectively. For the single-section arm, the targets reach a bending angle of $""" + f"{cS['target_bend_max']:.1f}" + r"""^\circ$ and the trajectories $""" + f"{cS['traj_bend_max']:.1f}" + r"""^\circ$, compared with a 95th percentile of $""" + f"{cS['train_bend']['p95']:.1f}" + r"""^\circ$ in the training data (Fig.~S9). The length change of the central axis is """ + LEN_S + r""" for the single-section targets (training data, 5th to 95th percentile: """ + TR_S + r""") and """ + LEN_M + r""" per section for the multi-section targets (Tables~S8 and S9), so the evaluation covers a limited range of compression.
 """)
 S("figS9", r"""
 \begin{figure}[h]
@@ -529,15 +539,15 @@ S("figS9", r"""
 \label{fig:S9_coverage}
 \end{figure}
 """)
-rows = "\n".join(f"{t['id']} & {t['x']:.1f} & {t['y']:.1f} & {t['z']:.1f} & {t['bend_deg']:.1f} \\\\" for t in cS["targets"])
+rows = "\n".join(f"{t['id']} & {t['x']:.1f} & {t['y']:.1f} & {t['z']:.1f} & {t['bend_deg']:.1f} & {t['dL_mm']:.1f} \\\\" for t in cS["targets"])
 S("tab_S8_targets_single", r"""
 \begin{table}[h]
 \centering
-\caption{Control targets of the single-section arm. Bending angle: PCC estimate from the target position.}
+\caption{Control targets of the single-section arm. Bending angle: PCC estimate from the target position. $\Delta L$: length change of the central axis, i.e., mean tendon displacement of the sampled configuration that the target corresponds to (Eq.~2).}
 \label{tab:S8_targets_single}
-\begin{tabular}{rrrrr}
+\begin{tabular}{rrrrrr}
 \toprule
-ID & $x$ [mm] & $y$ [mm] & $z$ [mm] & Bending [$^\circ$] \\
+ID & $x$ [mm] & $y$ [mm] & $z$ [mm] & Bending [$^\circ$] & $\Delta L$ [mm] \\
 \midrule
 """ + rows + r"""
 \bottomrule
@@ -623,7 +633,7 @@ We thank the reviewer for this careful reading. The reviewer is correct that the
 The initial PCC estimate in Algorithm~1 is not discarded. The tendon lengths $\mathbf{l}_0$ obtained from the camera-estimated section-tip positions through the inverse PCC map are used once, before the loop, to set the encoder offset $\mathbf{l}_{\mathrm{off}} = \mathbf{l}_{\mathrm{enc}} - \mathbf{l}_0$, so that the encoder readings inside the loop are expressed in the PCC tendon-length frame used by $\mathbf{J}(\mathbf{l})$ and by the null-space term $\mathbf{N}(\bar{\mathbf{l}} - \mathbf{l})$. Algorithm~1 and Section~3.3.2 now show this step explicitly.
 """)
 S("resp_2", r"""
-We thank the reviewer for these references. We added Hofer et al., Thuruthel et al., Han et al., and Lu et al.\ (Yoo et al.\ was already cited as Ref.~[15]) and a paragraph in the Introduction that states what each study established, together with a comparison table in the SI (Table~S10). Hofer et al.\ obtain a higher orientation accuracy (about $1^\circ$ at 30~Hz) than our single-section estimate ($3.11^\circ$ at about 8~Hz), on a two-angle spherical joint with an internal painted pattern and illumination; our system estimates the full 6-DoF tip pose of an extensible section without internal markers and is applied to three sections. Thuruthel et al.\ learned closed-loop inverse kinematics with end-effector feedback, Han et al.\ and Yoo et al.\ estimate shape from internal cameras without closing a control loop, and Lu et al.\ servo the shape with fiber Bragg grating sensing. The capability we add is the combination of distributed internal cameras on a multi-section arm with closed-loop control that explicitly exploits the actuation redundancy, through model-based null-space control and through a learned inverse kinematics with a secondary objective. We narrowed the novelty statement in the Introduction and the contribution list to this combination.
+We thank the reviewer for these references. We added Hofer et al., Thuruthel et al., Han et al., and Lu et al.\ (Yoo et al.\ was already cited as Ref.~[15]) and a paragraph in the Introduction that states what each study established, together with a comparison table in the SI (Table~S10). Since the systems differ in actuation, size, and task, the table compares design choices rather than accuracy: the sensing, the part of the arm that is sensed, the estimated quantities, whether the loop is closed on the estimate, and how the actuation redundancy is used. Each prior system covers part of these choices, and ours is the only one that combines them. Hofer et al.\ obtain a higher orientation accuracy (about $1^\circ$ at 30~Hz) than our single-section estimate ($3.11^\circ$ at about 8~Hz), on a two-angle spherical joint with an internal painted pattern and illumination; our system estimates the full 6-DoF tip pose of an extensible section without internal markers and is applied to three sections. Thuruthel et al.\ learned closed-loop inverse kinematics with end-effector feedback, Han et al.\ and Yoo et al.\ estimate shape from internal cameras without closing a control loop, and Lu et al.\ servo the shape with fiber Bragg grating sensing. The capability we add is the combination of distributed internal cameras on a multi-section arm with closed-loop control that explicitly exploits the actuation redundancy, through model-based null-space control and through a learned inverse kinematics with a secondary objective. We narrowed the novelty statement in the Introduction and the contribution list to this combination.
 """)
 S("resp_3", r"""
 We agree. The input layer and the regression head both depend on the number of sections, and separate networks were trained for the one- and three-section arms. We corrected the statement in Section~3.1 and rephrased the Introduction, the contribution list, and the Conclusion accordingly: the backbone is transferred and the network is retrained, and only $n = 1$ and $n = 3$ were validated. We also removed the word ``scalable'' where it implied that no retraining is needed.
@@ -632,16 +642,16 @@ S("resp_4", r"""
 We agree. For the multi-section arm, inter-section marker occlusion prevented tracking all backbone markers during data collection, and the curvature labels were obtained from the motion-captured section-tip poses through $N_C$. We therefore now describe the multi-section result as a model-constrained reconstruction and state its assumptions explicitly in Section~2.2 and Section~4.2.2: planar bending within each section, no torsion, and a bending direction that is constant along each section. The errors in Fig.~7b quantify the agreement with these model-constrained labels. For Fig.~S2b, we now report the number of validation configurations (20, posed manually with all subsection markers visible and recorded in a separate session), that the error bars are one standard deviation across configurations, and that these configurations are independent of the data used to train $N_C$ (single-section dataset) and the three-section curvature estimator. We also report the error of $N_C$ on held-out single-section test data ($N = 500$): 0.38--0.43~mm at $L/3$, 1.20--1.37~mm at $2L/3$, and 2.49--2.94~mm at $L$ for the three curvature models (SI Section~4.2).
 """)
 S("resp_5", r"""
-We thank the reviewer. The implementation and the SI equations use the dimensional arc length $x \in [0, L]$. We corrected the main text accordingly (Eqs.~4--6, the translation integral without the factor $L$, and the evaluation points $x = L/3, 2L/3, L$), the initialization sentence in SI Section~2.2, and the nomenclature in Table~S1, which now gives the units of $c_0$, $c_1$, and $c_2$ (mm$^{-1}$, mm$^{-2}$, mm$^{-3}$).
+We thank the reviewer. The implementation and the SI equations use the dimensional arc length $x \in [0, L]$. We corrected the main text accordingly (Eqs.~4--6, the translation integral without the factor $L$, and the evaluation points $x = L/3, 2L/3, L$), the variable of SI Eqs.~S3--S4 and the initialization sentence in SI Section~2.2, and the nomenclature in Table~S1, which now gives the units of $c_0$, $c_1$, and $c_2$ (mm$^{-1}$, mm$^{-2}$, mm$^{-3}$).
 """)
 S("resp_6", r"""
 We agree that $H(\mathbf{l})$ centers the tendon lengths in their actuation range and does not measure effort, which was not recorded. We now describe it as actuator-range centering and removed the statements about effort (Introduction, Section~3.3.2, Conclusion). To isolate its effect without new hardware experiments, we performed offline ablations on identical targets for both controllers (new SI Section~5.3, Fig.~S8, and Table~S13). For the model-based controller, replaying the control law on the PCC model for the 20 evaluation targets gives a final position error of $5.25 \pm 2.23$~mm with and $5.84 \pm 1.85$~mm without the null-space term, while the RMS deviation of the tendon lengths from $\bar{\mathbf{l}}$ decreases from $12.00 \pm 3.18$~mm to $7.48 \pm 1.96$~mm ($H(\mathbf{l})$: $693 \pm 396$ vs.\ $269 \pm 135$). For the data-driven controller, we retrained the inverse-kinematics network with and without the secondary term ($\zeta = 0.01$ and $\zeta = 0$, same data, split, and seed) and evaluated it through the frozen forward network on the same targets: the secondary term reduces $H(\mathbf{l})$ from """ + f"${b['H_mean']:.0f} \\pm {b['H_std']:.0f}$ to ${a['H_mean']:.0f} \\pm {a['H_std']:.0f}$ (RMS tendon deviation from {b['rms_dev_mean']:.1f} to {a['rms_dev_mean']:.1f}~mm), at the cost of a small increase of the position error predicted by the forward network (${a['pos_mean']:.1f} \\pm {a['pos_std']:.1f}$ vs.\\ ${b['pos_mean']:.1f} \\pm {b['pos_std']:.1f}$~mm)" + r""". Unlike the null-space projection, the penalty in the training loss trades some primary-task accuracy for range centering, which we now state in Section~3.3.2. These results are simulated through the respective models and are reported as such.
 """)
 S("resp_7", r"""
-We thank the reviewer. We replaced the bending range in Section~3.2 with the measured one (single section: maximum $57^\circ$, 95th percentile $36^\circ$; multi-section 95th percentiles of $30^\circ$, $32^\circ$, and $34^\circ$), and we added the coordinates of all targets with their bending angle and length change (Tables~S8 and S9) and the coverage of the evaluation set (SI Section~6.3 and Fig.~S9). The single-section targets and trajectories reach """ + f"${cS['target_bend_max']:.1f}^\\circ$ and ${cS['traj_bend_max']:.1f}^\\circ$" + r""", close to the 95th percentile of the training data (""" + f"${cS['train_bend']['p95']:.1f}^\\circ$" + r"""); the 20 targets span """ + f"{100 * cS['hull_volume_ratio']:.1f}" + r"""\% (single) and """ + f"{100 * cM['hull_volume_ratio']:.1f}" + r"""\% (multi) of the convex hull of the sampled positions. We revised the text to state that the reported standard deviations describe the variation across targets visited once, not repeatability, and that trajectory waypoints are serially correlated. The disturbance experiment is now described as the compensation of a single constant 50~g off-center load rather than general robustness. Repeated trials, non-planar and boundary trajectories, and further load conditions are listed as limitations and future work in Section~5.
+We thank the reviewer. We replaced the bending range in Section~3.2 with the measured one (single section: maximum $57^\circ$, 95th percentile $36^\circ$; multi-section 95th percentiles of $30^\circ$, $32^\circ$, and $34^\circ$), and we added the coordinates of all targets with their bending angle and length change (Tables~S8 and S9) and the coverage of the evaluation set (SI Section~6.3 and Fig.~S9). The single-section targets and trajectories reach """ + f"${cS['target_bend_max']:.1f}^\\circ$ and ${cS['traj_bend_max']:.1f}^\\circ$" + r""", close to the 95th percentile of the training data (""" + f"${cS['train_bend']['p95']:.1f}^\\circ$" + r"""); the 20 targets span """ + f"{100 * cS['hull_volume_ratio']:.1f}" + r"""\% (single) and """ + f"{100 * cM['hull_volume_ratio']:.1f}" + r"""\% (multi) of the convex hull of the sampled positions. The length changes of the targets are """ + LEN_S + r""" (single section; training data, 5th to 95th percentile: """ + TR_S + r""") and """ + LEN_M + r""" per section (multi-section); we agree that this is a limited range of compression and now state it in SI Section~6.3. We revised the text to state that the reported standard deviations describe the variation across targets visited once, not repeatability, and that trajectory waypoints are serially correlated. The disturbance experiment is now described as the compensation of a single constant 50~g off-center load rather than general robustness. Repeated trials, non-planar and boundary trajectories, larger length changes, and further load conditions are listed as limitations and future work in Section~5.
 """)
 S("resp_8", r"""
-We added this information to Section~3.1.1 and SI Section~4.1. All samples of each dataset were pooled and randomly permuted with a fixed seed before the 85/10/5 division; the split was not blocked by session or by configuration neighborhood. Because each commanded configuration of the multi-section arm was held for about 3~s and recorded at 1~Hz, some test samples share their configuration with training samples. To quantify the effect, we evaluated the test error with and without these samples: for the multi-section arm, the tip position errors become """ + f"{ld['pos_I']['rest_mean']:.2f}, {ld['pos_II']['rest_mean']:.2f}, and {ld['pos_III']['rest_mean']:.2f}~mm (instead of {ld['pos_I']['all_mean']:.2f}, {ld['pos_II']['all_mean']:.2f}, and {ld['pos_III']['all_mean']:.2f}~mm)" + r""" (Table~S14), and for the single-section arm, samples close to a training configuration are not more accurate than the others (""" + f"{sd['pos']['dup_mean']:.2f} vs.\\ {sd['pos']['rest_mean']:.2f}~mm" + r"""). Session-blocked evaluation is listed as a limitation. The control targets were selected among the sampled workspace configurations and were therefore not excluded from training; the closed-loop experiments use new camera images, and the trajectories are not part of the datasets. The single-section data were collected in one day and the multi-section data on two days, with the same camera settings and one build of each arm \textbf{[CONFIRM]}; the two arms use different coverings (corrugated silicone and stretchable fabric, Section~2.1).
+We added this information to Section~3.1.1 and SI Section~4.1. All samples of each dataset were pooled and randomly permuted with a fixed seed before the 85/10/5 division; the split was not blocked by session or by configuration neighborhood. Because each commanded configuration of the multi-section arm was held for about 3~s and recorded at 1~Hz, some test samples share their configuration with training samples. To quantify the effect, we evaluated the test error with and without these samples: for the multi-section arm, the tip position errors become """ + f"{ld['pos_I']['rest_mean']:.2f}, {ld['pos_II']['rest_mean']:.2f}, and {ld['pos_III']['rest_mean']:.2f}~mm instead of {ld['pos_I']['all_mean']:.2f}, {ld['pos_II']['all_mean']:.2f}, and {ld['pos_III']['all_mean']:.2f}~mm" + r""" (Table~S14), and for the single-section arm, samples close to a training configuration are not more accurate than the others (""" + f"{sd['pos']['dup_mean']:.2f} vs.\\ {sd['pos']['rest_mean']:.2f}~mm" + r"""). Session-blocked evaluation is listed as a limitation. The control targets were selected among the sampled workspace configurations and were therefore not excluded from training; the closed-loop experiments use new camera images, and the trajectories are not part of the datasets. The single-section data were collected in one day and the multi-section data on two days, with the same camera settings and one build of each arm \textbf{[CONFIRM]}; the two arms use different coverings (corrugated silicone and stretchable fabric, Section~2.1).
 """)
 S("resp_9", r"""
 We added a reproducibility table to the SI (Table~S11) that collects the camera and acquisition settings, the network architectures, the training hyperparameters (optimizer, learning-rate schedule, maximum epochs, early stopping, batch size, random seed, normalization, angle handling, augmentation) for all networks including $N_C$, $N_p^3$, and $N_l^3$, the actuation hardware and pretensioning procedure, the tendon material and diameter, the sampled tendon ranges, and the acquisition sessions (Table~S12). We also limited the statements on lighting: image augmentations were used during training, but robustness to lighting or hardware variations was not tested, and this is now stated in Section~5.
@@ -689,7 +699,7 @@ S("resp_23", r"""
 We agree that the summed statistic was ambiguous and not comparable between the two arms. Figure~7 now shows the 3D error at each reference point against the normalized arc length, for both arms on the same horizontal axis (median and interquartile range over the 500 test samples), and the caption and Sections~4.1.2 and 4.2.2 define the statistic.
 """)
 S("resp_24", r"""
-Table~1 now also reports the median, 95th percentile, and maximum error, and the text states that the mean orientation error is below $9^\circ$ (the median is below $7^\circ$). The large standard deviations and maxima are caused by 10 of the 500 test samples (2\%), most of which have motion-capture orientation labels inconsistent with the sampled range; we discuss them in SI Section~6.1 (see also our response to the comment on Table~S6).
+Table~1 now also reports the median, 95th percentile, and maximum error, and the text states that the mean orientation error is below $9^\circ$ (the median is below $7^\circ$). The large standard deviations and maxima are caused by 10 of the 500 test samples (2\%), most of which have motion-capture orientation labels inconsistent with the sampled range; we discuss them in SI Section~6.1 (see also our response to Comment~29).
 """)
 S("resp_25", r"""
 We plotted the error against the bending angle (new Fig.~S7). For the single-section arm, the error decreases with bending (Spearman $\rho = """ + f"{bs['rho_pos']:.2f}" + r"""$, $p < 0.001$), which supports the statement in Section~4.1.1, now given with this value. For the multi-section arm, no clear dependence was found, and we revised the corresponding sentence in Section~4.2.1.
@@ -756,30 +766,35 @@ Q = {  # reviewer/editor text, verbatim from the decision letter (LaTeX-escaped)
  "30": r"Figs. S4-S6 should use matched target identifiers or connecting pairs so the reader can compare the same workspace locations across controllers. Use consistent color limits when the goal is direct visual comparison.",
  "31": r"Tables S3 and S4 list dataset fields but not dataset composition. Add sample counts per acquisition mode and robot configuration, including how many samples were removed and why.",
 }
-heads = [("Response to the Editor", None)] + [("Editor's requirements", "G")] + \
-        [("Response to Reviewer 1", None), ("Overall assessment", "overall")] + \
-        [(f"Comment {i}", str(i)) for i in range(1, 11)] + [("Minor comments", None)] + \
-        [(f"Comment {i}", str(i)) for i in range(11, 28)] + [("Supporting Information", None)] + \
-        [(f"Comment {i} (SI)", str(i)) for i in range(28, 32)]
+# (heading, comment key or None, level): 1 section, 2 subsection, 3 subsubsection
+heads = [("Response to the Editor", None, 1), ("Editor's requirements", "G", 2),
+         ("Response to Reviewer 1", None, 1), ("Overall assessment", "overall", 2), ("Major comments", None, 2)] + \
+        [(f"Comment {i}", str(i), 3) for i in range(1, 11)] + [("Minor comments", None, 2)]
+PAGES = {11: "pages 1--2", 13: "pages 3--5", 16: "pages 5--7", 21: "pages 8--11"}
+grp = None
+for i in range(11, 28):
+    grp = PAGES.get(i, grp)
+    heads.append((f"Comment {i} ({grp})", str(i), 3))
+heads += [("Supporting Information", None, 2)] + [(f"Comment {i} (SI)", str(i), 3) for i in range(28, 32)]
 L = [r"""\documentclass[11pt,a4paper]{article}
 \usepackage[margin=2.2cm]{geometry}
 \usepackage[T1]{fontenc}
-\usepackage{lmodern,amsmath,amssymb,xcolor}
+\usepackage{lmodern,amsmath,amssymb,xcolor,needspace}
 \setlength{\parindent}{0pt}\setlength{\parskip}{6pt}
 \newcommand{\rc}[1]{\begin{quote}\color{black!70}\itshape #1\end{quote}}
 \begin{document}
-{\Large\bfseries Response to the reviewer}\\[4pt]
+{\Large\bfseries Response to the editor and the reviewer}\\[4pt]
 Manuscript 3400076, ``Internal Camera-based Reconstruction and Closed-loop Control of Soft Robotic Arms''
 
 Dear Dr.\ Murray,
 
-We thank you and the reviewer for the careful evaluation of our manuscript. We have revised the manuscript and the Supporting Information according to all comments. Below, the comments are reproduced in italics and followed by our response; changes in the manuscript are highlighted.
+We thank you and the reviewer for the careful evaluation of our manuscript. We have revised the manuscript and the Supporting Information according to all comments. Below, the comments are reproduced in italics and followed by our response; changes in the manuscript are highlighted. The major comments keep the reviewer's numbering (1--10); the minor comments and the comments on the Supporting Information are numbered 11--31 in the order of the report.
 """]
-for h, k in heads:
+CMD = {1: "section", 2: "subsection", 3: "subsubsection"}
+for h, k, lev in heads:
+    L.append(f"\\needspace{{{14 - 2 * lev}\\baselineskip}}\\{CMD[lev]}*{{{h}}}")  # keep headings with their text
     if k is None:
-        L.append(f"\\section*{{{h}}}")
         continue
-    L.append(f"\\subsection*{{{h}}}")
     L.append(f"\\rc{{{Q[k]}}}")
     L.append(SNIP["resp_" + k].strip())
 L.append(r"""

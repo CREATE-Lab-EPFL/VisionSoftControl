@@ -97,7 +97,7 @@ G1--G6 & Editor: title, references, acronyms, figure text, copyright, DOIs & Acr
 18 & PCC line in Alg.~1 & Alg.~1, Sec.~3.3.2 & \ref{sec:ctrl}\\
 19 & Jacobian notation & Secs.~3.3, 3.3.1, Eq.~7, Algs.~1--2, Fig.~S3, Table~S2 & \ref{sec:ctrl}\\
 20 & Open-loop baselines, terminology & Sec.~3.3.1, ``feedforward'' & \ref{sec:ctrl}\\
-21 & Percentage denominators & Secs.~4.1.1, 4.1.4, 4.2.1, 4.2.3, 4.2.4 & \ref{sec:results}\\
+21 & Percentage denominators & Secs.~4.1.1, 4.1.4, 4.2.1, 4.2.3, 4.2.4, 4.2.6 & \ref{sec:results}\\
 22 & Fig.~5b scaling & Fig.~5b, caption & \ref{sec:f5}\\
 23 & Fig.~7 statistic & Fig.~7, caption, Secs.~4.1.2, 4.2.2 & \ref{sec:f7}\\
 24 & Table~1 robust statistics & Table~1, Sec.~4.2.1 & \ref{sec:results}\\
@@ -314,19 +314,21 @@ The individual sensing and control elements of this paper have appeared in many 
 \snip{tab_S10_comparison}
 \preview{tab_S10_comparison}
 \begin{todo}[Check before submission]
+The table compares design choices, not performance: each prior row covers part of the picture (internal vision on one actuator or joint, or closed loop with other sensing), and only the last row combines internal vision on every section of a multi-section arm with closed-loop control that resolves the redundancy. This is the integration contribution the reviewer identified.
+
 How each row was checked:
 \begin{itemize}
 \item Hofer et al.: against the full text.
 \item Han et al.: against the project page.
-\item Yoo et al.\ (10.12~mm tip error, 100~mm actuator) and Lu et al.: against the abstracts.
+\item Yoo et al.\ and Lu et al.: against the abstracts.
 \end{itemize}
 Not confirmed from the full text:
 \begin{itemize}
-\item Thuruthel et al.: the sensor type (so the cell says only ``end-effector position feedback'') and the ``implicit'' redundancy.
-\item Han et al.: that a closed loop was ``not demonstrated''.
-\item The ``--'' cells of Lu et al.
+\item Thuruthel et al.: ``tip sensing'' (the sensor type) and ``implicit in the learned IK''.
+\item Han et al.: ``---'' for the closed loop.
+\item Lu et al.: ``---'' for redundancy.
 \end{itemize}
-Also replace \verb|\cite{REF15}| with your key for Ref.~[15] (Yoo et al.), and add the four new entries (\st{st:bib}) to the SI bibliography.
+The table needs \texttt{tabularx} and \texttt{array}. Replace \verb|\cite{REF15}| with your key for Ref.~[15] (Yoo et al.), and add the four new entries (\st{st:bib}) to the SI bibliography. If you prefer the table in the Introduction, it becomes Table~1 and the later tables shift by one.
 \end{todo}
 \step{Manuscript, Introduction: replace the novelty sentence by the comparison paragraph.}\label{st:introcomp}
 \find{To the best of our knowledge, no framework has yet combined such sensing with closed-loop null-space control of continuum robots, either through model-based or learning-based approaches.}
@@ -687,6 +689,9 @@ Denominators, verified from the notebooks:
 \snip{sec424_pct}
 \step{Manuscript, Section~4.2.3: add the denominator of ``$5.1 \pm 3.3$\% position'' and ``$2.1 \pm 1.2$\% translation''.}
 \FILL{e.g.\ ``of the 450~mm arm length''; check the forward-kinematics notebook}
+\step{Manuscript, Section~4.2.6: replace (adds the denominator).}
+\find{The closed-loop controller maintains $6.3 \pm 3.2$\% translation error and rotation below $15^\circ$, compared to $14.5 \pm 3.5$\% and larger orientation deviations for open-loop.}
+\snip{sec426_pct}
 \step{SI, new Section~6.6 after Section~6.5: insert. Fig.~S7 goes at the end of the SI.}
 \snip{si_bending}
 \snip{figS7_bending}
