@@ -313,22 +313,14 @@ The individual sensing and control elements of this paper have appeared in many 
 \step{SI, end of the document: add Table~S10 (comparison).}
 \snip{tab_S10_comparison}
 \preview{tab_S10_comparison}
-\begin{todo}[Check before submission]
-The table compares design choices, not performance: each prior row covers part of the picture (internal vision on one actuator or joint, or closed loop with other sensing), and only the last row combines internal vision on every section of a multi-section arm with closed-loop control that resolves the redundancy. This is the integration contribution the reviewer identified.
-
-How each row was checked:
+\begin{todo}[Notes]
 \begin{itemize}
-\item Hofer et al.: against the full text.
-\item Han et al.: against the project page.
-\item Yoo et al.\ and Lu et al.: against the abstracts.
-\end{itemize}
-Not confirmed from the full text:
-\begin{itemize}
-\item Thuruthel et al.: ``tip sensing'' (the sensor type) and ``implicit in the learned IK''.
-\item Han et al.: ``---'' for the closed loop.
-\item Lu et al.: ``---'' for redundancy.
-\end{itemize}
-The table needs \texttt{tabularx} and \texttt{array}. The citation keys are those of your bibliography (Yoo et al.\ is \texttt{yooZeroShotSimtoRealTransfer2023}); the SI bibliography must contain these five entries. If you prefer the table in the Introduction, it becomes Table~1 and the later tables shift by one.
+\item Design choices, not performance. Only the last row combines internal vision on every section, closed loop on that estimate, and explicit redundancy.
+\item Closest row: IMU-based control (per section, closed loop), but IMUs and no redundancy.
+\item All rows checked against the full papers, except Yoo et al.\ (abstract).
+\item Key facts: Thuruthel uses an Aurora EM tracker at the tip; Han's estimate drives a second robot (no closed loop on itself); Lu and Pei do not address redundancy; ConTac is a rigid 2-DoF arm with a soft skin.
+\item Needs \texttt{tabularx} and \texttt{array}. Keys are from your bibliography; the SI bibliography needs all nine entries.
+\end{itemize} If you prefer the table in the Introduction, it becomes Table~1 and the later tables shift by one.
 \end{todo}
 \step{Manuscript, Introduction: replace the novelty sentence by the comparison paragraph.}\label{st:introcomp}
 \find{To the best of our knowledge, no framework has yet combined such sensing with closed-loop null-space control of continuum robots, either through model-based or learning-based approaches.}
@@ -486,10 +478,13 @@ The rule is defined by \texttt{notation\_rule} (\st{st:feedback}): $\mathbf{J}_{
 \snip{sec331_openloop}
 \step{Replace ``feedforward'' by ``open-loop'' (keep the occurrence in the Introduction, which is about iterative learning control).}
 \begin{itemize}
-\item Section~4.1.4: ``the data-driven feedforward controller'' $\to$ ``the data-driven open-loop controller''.
 \item Section~4.2.5: ``feedforward accuracy is lower'' $\to$ ``open-loop accuracy is lower''.
 \item Captions of Figs.~6, 9 and 10: done in Part~1, including ``feedback controller'' $\to$ ``closed-loop controller''.
+\item Section~4.1.4: next step (also removes ``outperforms'', Comment~7).
 \end{itemize}
+\step{Manuscript, Section~4.1.4: replace (``open-loop''; differences observed on these targets, not general superiority).}
+\find{Conversely, the data-driven feedforward controller (7.3 $\pm$ 2.1\%) outperforms its model-based counterpart (10.2 $\pm$ 7.9\%) due to more accurate kinematics.}
+\snip{sec414_ol}
 \resp{19}
 \resp{20}
 
@@ -729,7 +724,7 @@ The opening of the letter (overall assessment) and the responses whose changes a
 \item Single-section training loss (Huber or MSE, note~\ref{priv:loss}). Snippet: \texttt{tab\_S11\_repro}.
 \item Removed batches/samples and why. Snippets: \texttt{si41\_composition}, \texttt{tab\_S12\_composition}, \texttt{resp\_31}.
 \item Forward-kinematics dataset: sampling, recorded range and logging (\texttt{tab\_S12\_composition}); the denominator in Section~4.2.3.
-\item Confirm one build per arm (\texttt{resp\_8}) and $S_{\mathrm{I}}$--$S_{\mathrm{III}}$ in Fig.~1b; check the cells listed in Section~\ref{sec:comp}.
+\item Confirm one build per arm (\texttt{resp\_8}) and $S_{\mathrm{I}}$--$S_{\mathrm{III}}$ in Fig.~1b.
 \end{itemize}
 
 \subsection{Notes for you only}\label{sec:private}

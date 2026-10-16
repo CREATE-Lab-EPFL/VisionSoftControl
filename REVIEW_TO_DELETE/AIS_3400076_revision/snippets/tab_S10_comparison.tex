@@ -9,14 +9,17 @@
 \hline
 \textbf{Approach} & \textbf{Sensing} & \textbf{Sensed along the arm} & \textbf{Estimated} & \textbf{Closed loop on the estimate} & \textbf{Redundancy}\\
 \hline
-Sim-to-real sensing~\cite{yooZeroShotSimtoRealTransfer2023} & internal camera & one actuator & shape & --- & ---\\
-Anchored proprioception~\cite{hanAnchoringMorphologicalRepresentations2025} & internal camera, marker & one module & motion, force, shape & --- & ---\\
+Internal-camera shape sensing~\cite{wangRealTimeSoftBody2020,yooZeroShotSimtoRealTransfer2023} & internal camera & one body & 3D shape & --- & ---\\
+Anchored proprioception~\cite{hanAnchoringMorphologicalRepresentations2025} & internal camera, marker, light & one module & motion, force, shape & --- & ---\\
 Spherical soft arm~\cite{hoferVisionBasedSensingApproach2021} & internal cameras, pattern, LEDs & one joint & orientation & PI & not exploited\\
-Learned closed-loop IK~\cite{thuruthelLearningClosedLoop2017} & tip sensing & tip & tip position & learned IK & implicit\\
-FBG shape servoing~\cite{luAdaptiveOnlineLearning2024} & FBG & whole body & shape & adaptive & ---\\
+ConTac~\cite{nguyenConTacContinuumEmulatedSoft2024} & internal camera, skin markers, LEDs & one unit & shape, contact & admittance & ---\\
+Visual shape control~\cite{almanzorStaticShapeControl2023} & external camera & whole body & image-space shape & visual IK & full-shape task\\
+Learned closed-loop IK~\cite{thuruthelLearningClosedLoop2017} & external EM tracker & tip & tip pose & learned IK & implicit\\
+FBG shape servoing~\cite{luAdaptiveOnlineLearning2024} & FBG fiber & whole body & 3D shape & adaptive & ---\\
+IMU-based control~\cite{peiIMUBasedPose2024} & IMUs, encoders & every section & section poses & PCC & ---\\
 \hline
 \textbf{Distributed vision with redundancy-aware control (ours)} & \textbf{internal cameras only} & \textbf{every section} & \textbf{tip poses, shape} & \textbf{model-based; learned IK} & \textbf{null space; IK training loss}\\
 \hline
 \end{tabularx}\\[2pt]
-\parbox{\linewidth}{\footnotesize IK: inverse kinematics; PI: proportional--integral; FBG: fiber Bragg grating; ---: not addressed.}
+\parbox{\linewidth}{\footnotesize IK: inverse kinematics; PI: proportional--integral; EM: electromagnetic; FBG: fiber Bragg grating; IMU: inertial measurement unit; PCC: piecewise constant curvature; ---: not addressed.}
 \end{table*}

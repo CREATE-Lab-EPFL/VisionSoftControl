@@ -1,1 +1,4 @@
-The networks regress the angles directly; the sine and cosine of the predicted and target angles are only used inside the loss to remove the $2\pi$ discontinuity, so no conversion back to angles is needed. Positions, lengths, and curvature coefficients are standardized with the mean and standard deviation of the training set, and all loss terms have equal weight. This is now stated in SI Section~3.1 and Table~S11.
+\rc{Explain how angular sine/cosine outputs are converted back to angles and how losses for position, orientation, length, and curvature are balanced after normalization.}
+\textbf{Response.} The networks regress angles directly; sine and cosine are used only inside the loss, so no decoding is needed. Targets are standardized with training statistics, and all loss terms have equal weight.
+
+\textit{Changes:} SI Section~3.1; Table~S11.

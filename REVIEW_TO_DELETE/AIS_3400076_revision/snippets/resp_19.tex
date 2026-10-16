@@ -1,1 +1,4 @@
-We now use a single notation, defined in Section~3.3: $\mathbf{J}_{a \to b} = \partial b / \partial a$. The analytical PCC Jacobians are forward Jacobians ($\mathbf{J}_{l \to t}$, $\mathbf{J}_{l \to p}$) with damped pseudoinverse $\mathbf{J}^{\#}$, and the Jacobians of the learned inverse kinematics are denoted with a hat ($\hat{\mathbf{J}}_{t \to l}$, $\hat{\mathbf{J}}_{p \to l}$). The notation is used consistently in Eqs.~7--10, Algorithms~1--2, Fig.~S3, and Table~S2.
+\rc{Use consistent Jacobian notation. J\_t2l, J\_l2p, and their learned representations currently alternate between a forward Jacobian, an inverse Jacobian, and a derivative of an inverse network. These might be confusing to follow for the readers.}
+\textbf{Response.} One notation: $\mathbf{J}_{a \to b} = \partial b / \partial a$. PCC Jacobians are forward ($\mathbf{J}_{l \to t}$, $\mathbf{J}_{l \to p}$); learned ones carry a hat ($\hat{\mathbf{J}}_{t \to l}$, $\hat{\mathbf{J}}_{p \to l}$).
+
+\textit{Changes:} Section~3.3; Eqs.~7--10; Algorithms~1--2; Fig.~S3; Table~S2.

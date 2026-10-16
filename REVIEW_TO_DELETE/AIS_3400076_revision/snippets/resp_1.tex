@@ -1,3 +1,17 @@
-We thank the reviewer for this careful reading. The reviewer is correct that the curvature reconstruction does not enter either control law: both controllers close the loop on the tip pose estimated from the camera images, the model-based controller additionally uses the motor encoders to evaluate the PCC Jacobian and the null-space term, and the curvature estimate is evaluated as a separate sensing capability. We now state this explicitly in the Abstract, the contribution list, Section~3.3, the caption of Fig.~4c (which now shows the encoder path), and the Conclusion.
+\rc{1. Clarify the role of visual sensing in closed-loop control. The manuscript presents pose estimation and full-body piecewise-polynomial-curvature (PPC) reconstruction as parts of a unified sensing-and-control framework. However, Algorithms 1 and 2 and Fig. S3 indicate that both controllers use feedback from the pose network, while the curvature network is evaluated separately and does not enter either control law.}
+\textbf{Response.} Correct. Both controllers close the loop on the camera-estimated tip pose. The curvature reconstruction is a separate sensing output and does not enter either control law. We now state this explicitly.
 
-The initial PCC estimate in Algorithm~1 is not discarded. The tendon lengths $\mathbf{l}_0$ obtained from the camera-estimated section-tip positions through the inverse PCC map are used once, before the loop, to set the encoder offset $\mathbf{l}_{\mathrm{off}} = \mathbf{l}_{\mathrm{enc}} - \mathbf{l}_0$, so that the encoder readings inside the loop are expressed in the PCC tendon-length frame used by $\mathbf{J}(\mathbf{l})$ and by the null-space term $\mathbf{N}(\bar{\mathbf{l}} - \mathbf{l})$. Algorithm~1 and Section~3.3.2 now show this step explicitly.
+\textit{Changes:} Section~3.3 (new paragraph).
+
+\rc{Algorithm 1 also uses a PCC inverse calculation to initialize tendon lengths from section-tip positions. This is not the same as using the image-based PPC curvature estimate. Moreover, the resulting estimate appears to be replaced by the motor-encoder measurement at the first control iteration, before it affects the control command. The authors should explain this initialization or remove it.}
+\textbf{Response.} The estimate is not replaced. It is used once, before the loop, to set the encoder offset $\mathbf{l}_{\mathrm{off}} = \mathbf{l}_{\mathrm{enc}} - \mathbf{l}_0$. Inside the loop, the encoder readings are then expressed in the PCC tendon frame used by $\mathbf{J}(\mathbf{l})$ and by the null-space term. We kept the step and made it explicit.
+
+\textit{Changes:} Algorithm~1 (offset line added); Section~3.3.2.
+
+\rc{The abstract, contribution list, Fig. 4c, and conclusion should clearly distinguish: camera-based pose estimation used for control; encoder measurements used to calculate the Jacobian and null-space term; and image-based PPC reconstruction evaluated as a separate sensing capability.}
+\textbf{Response.} Done in all four places.
+
+\textit{Changes:} Abstract; contributions 1--3; Fig.~4c (encoder block added, curvature CNN outside the loop) and caption; Conclusion.
+
+\rc{If the curvature estimate is intended to contribute to control, the manuscript should explicitly show where it enters the control law.}
+\textbf{Response.} It is not used for control; this is now stated (see above).

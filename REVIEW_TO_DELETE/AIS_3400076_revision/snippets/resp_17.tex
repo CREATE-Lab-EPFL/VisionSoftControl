@@ -1,1 +1,4 @@
-In Eq.~S11 the Grad-CAM score is the negative loss, so positive weights correspond to feature-map channels whose activation reduces the prediction loss; after the ReLU of Eq.~S12, the heatmap retains only these regions. The maps are normalized to $[0, 1]$ per image and shown without thresholding, so the color scale in Fig.~4a shows this relative contribution. We clarified both points in SI Section~3.2 and in the caption of Fig.~4.
+\rc{Clarify the negative sign in Eq. S11 and clarify how the highlighted pixels are the regions used for prediction.}
+\textbf{Response.} The score is the negative loss, so positive weights mark regions whose activation reduces the loss; after the ReLU only these remain. Maps are normalized to $[0, 1]$ per image and shown without threshold.
+
+\textit{Changes:} SI Section~3.2; Fig.~4 caption.

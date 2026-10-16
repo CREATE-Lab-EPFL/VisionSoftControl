@@ -13,11 +13,11 @@ Last update: 2026-10-15. Everything lives in the repository folder `REVIEW_TO_DE
 - Already in the repo: `MULTI_nullspace_ablation.ipynb` (Fig. S8a), `SINGLE_workspace_coverage.ipynb` and `MULTI_workspace_coverage.ipynb` (Fig. S9).
 
 ## Sources (AIS_3400076_revision/)
-- `snippets/`: every LaTeX snippet and `response_letter.tex`; regenerate with `python scripts/snippets.py` (visioncontrol env).
+- `snippets/`: every LaTeX snippet and `response_letter.tex`; regenerate with `python scripts/snippets.py` then `python scripts/response_letter.py` (visioncontrol env).
 - `build/main.tex` + `crops/`: guide source (`pdflatex` twice from `build/`).
 - `scripts/` + `data/`: analyses behind the numbers and tables; `scripts/build_notebooks.py` writes and executes the two revision notebooks.
 
 ## Open items (need the author)
 - [FILL] camera model/lens/size/mass, exposure, pretension criterion, current limit, tendon material/diameter, removed samples, FK dataset details, Sec. 4.2.3 denominator.
 - [CONFIRM] one build per arm; S_I-S_III in Fig. 1b; Huber vs MSE for the single-section networks.
-- Check unverified cells of the comparison table (Thuruthel sensor, Han closed loop, Lu "--").
+- Comparison table: all rows checked against the full papers in `REVIEW_TO_DELETE/papers/`, except Yoo et al. (abstract).

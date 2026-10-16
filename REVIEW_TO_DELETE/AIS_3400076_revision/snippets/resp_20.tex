@@ -1,1 +1,4 @@
-Section~3.3.1 now states that the open-loop baselines use the same planner, waypoint spacing, damping, and target sequence as the closed-loop controllers. Their initial state is measured once by motion capture and then propagated with the model-based or data-driven kinematics instead of the camera estimate, and they execute the full waypoint sequence without a convergence check. We use ``open-loop'' throughout.
+\rc{State whether the open-loop baselines use the same measured initial pose, planner, gains, stopping limits, and commanded waypoint sequence as the closed-loop methods. `Open-loop' and `feedforward' should be used consistently.}
+\textbf{Response.} Same planner, waypoint spacing, damping, and targets. The initial state is measured once by motion capture and then propagated by the model; there is no convergence check. We use ``open-loop'' throughout.
+
+\textit{Changes:} Section~3.3.1; Figs.~6, 9, 10; Sections~4.1.4, 4.2.5.
