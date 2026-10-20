@@ -1,4 +1,0 @@
-\rc{Explain how angular sine/cosine outputs are converted back to angles and how losses for position, orientation, length, and curvature are balanced after normalization.}
-\textbf{Response.} The networks regress angles directly; sine and cosine are used only inside the loss, so no decoding is needed. Targets are standardized with training statistics, and all loss terms have equal weight.
-
-\textit{Changes:} SI Section~3.1; Table~S11.

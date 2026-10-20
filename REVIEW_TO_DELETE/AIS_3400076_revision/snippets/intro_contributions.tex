@@ -1,6 +1,0 @@
-\begin{enumerate}
-\item A distributed vision-based sensing strategy for soft arms that uses miniature cameras embedded in each section of the robot. It provides dense feedback that is markerless at inference (external motion-capture markers are used only to generate training labels) for tip-pose estimation and full-body curvature reconstruction, and can be extended to arms with a different number of sections through modular hardware and a lightweight CNN whose backbone is transferred and retrained; we validated arms with one and three sections.
-\item Integration of embedded vision with model-based null-space control. We close the loop on the camera-estimated pose with a Jacobian-based Piecewise Constant Curvature velocity controller, in which the motor encoders provide the tendon lengths for the Jacobian and the null-space term.
-\item A data-driven framework for both sensing and control. We train learning-based inverse kinematics models that generate actuation commands from the camera-estimated pose without encoder feedback, with a secondary objective in the training loss.
-\item Experimental validation of pose regulation with both controllers on single- and multi-section arms, including a constant tip payload, and an offline evaluation of the secondary objectives.
-\end{enumerate}

@@ -1,5 +1,0 @@
-However, soft arms undergo deformations due to external forces and self-weight, requiring more complex shape approximations for full-body proprioception. We adopt the Piecewise Polynomial Curvature (PPC) model [31], which retains the $\boldsymbol{\xi}$-parameters. It expresses the curvature $\kappa(x)$ of the central axis of a section as a polynomial in the arc length $x \in [0, L]$, with the local bending angle $\theta(x) = \int_0^x \kappa(v)\, dv$. For example, in the quadratic case:
-\begin{equation}
-\theta(x) = c_0 x + \frac{1}{2} c_1 x^2 + \frac{1}{3} c_2 x^3, \qquad x \in [0, L]
-\end{equation}
-where $c_0$, $c_1$, and $c_2$ have units of mm$^{-1}$, mm$^{-2}$, and mm$^{-3}$.
