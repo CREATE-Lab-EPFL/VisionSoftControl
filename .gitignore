@@ -30,3 +30,8 @@ MULTI/end_effector/
 __pycache__/
 *.pyc
 *.npz
+
+# Local only
+*.npz
+.claude/
+REVIEW_TO_DELETE/
