@@ -1,0 +1,25 @@
+\rc{7. Expand and better characterize the control evaluation. The experimental evaluation does not quantify its coverage relative to the reachable workspace. The training datasets reportedly include bending angles up to 85$^\circ$ per section, and the multisection target plots span a substantial positional range. However The trajectory evaluation is narrow, and the target coverage is incompletely documented. Single-section bending angles are apparently under 17 deg, and three-section angles are under 19 deg, and overall length changes are also quite limited. The evaluation does not include workspace-boundary paths, nonplanar trajectories, large orientation changes, or trajectories requiring qualitatively different section configurations.}
+\textbf{Response.} We quantified the coverage:
+\begin{itemize}
+\item Training bending: single section, maximum $57^\circ$ (95th percentile $36^\circ$); multi-section 95th percentiles $30^\circ$, $32^\circ$, $34^\circ$. The ``$85^\circ$'' is corrected.
+\item Single-section targets and trajectories reach $33.7^\circ$ and $40.9^\circ$.
+\item Length changes are limited, as the reviewer notes: $-20.5$ to $-9.7$~mm (single; training 5th--95th percentile $-24.4$ to $-7.0$~mm) and $-18.5$ to $-12.7$~mm per section (multi).
+\item Boundary, non-planar, and large-orientation trajectories are listed as limitations.
+\end{itemize}
+
+\textit{Changes:} Section~3.2; SI Section~6.3; Fig.~S9; Section~5.
+
+\rc{Figs. S4--S6 plot the target positions and associated errors, but the coordinates are not tabulated and the targets are not compared with the complete reachable or sampled workspace. The authors should report the target coordinates, associated bending and compression ranges, and the fraction of the sampled workspace represented by the evaluation set.}
+\textbf{Response.} Added: coordinates, bending angle, and length change of every target. The targets span 9.2\% (single) and 16.4\% (multi) of the convex hull of the sampled positions.
+
+\textit{Changes:} Tables~S8 and S9; SI Section~6.3.
+
+\rc{Each of the 20 targets is visited only once. Consequently, the reported standard deviations describe variation across different targets, not trial-to-trial repeatability, and do not establish that one controller outperforms the other. The 30 waypoints in each trajectory are likewise serially correlated rather than independent trials.}
+\textbf{Response.} Agreed. The text and captions now say this, and differences between controllers are reported as observed on these targets, not as general superiority.
+
+\textit{Changes:} Section~4.1.4; captions of Figs.~5 and 8; Table~S7.
+
+\rc{The disturbance experiment should also be characterized more narrowly. A single 50 g off-center payload demonstrates compensation for one constant load (which is only moderately successful), not general robustness to disturbances or contact. Either additional load magnitudes and directions should be tested or the claims should be limited.}
+\textbf{Response.} We limited the claims: the test shows compensation of one constant load. Further load magnitudes and directions are listed as future work.
+
+\textit{Changes:} Abstract; Section~4.2.6; Conclusion; Section~5.

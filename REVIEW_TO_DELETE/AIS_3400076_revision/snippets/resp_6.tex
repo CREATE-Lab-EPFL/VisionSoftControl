@@ -1,0 +1,14 @@
+\rc{6. Quantitatively evaluate the secondary objective. The control contribution is framed as redundancy-aware null-space control, but the manuscript reports no quantitative experimental results isolating the effect of the secondary objective. No reported experiment shows the objective H(l), tendon-limit margins, tendon distributions, or configurations obtained with and without the secondary objective. Furthermore, H(l) penalizes displacement from the mean sampled tendon vector. It does not directly minimize tendon force, motor current, energy, or control effort. The objective should therefore might described as actuator-range centering unless effort is measured.}
+\textbf{Response.} Agreed. Effort was not measured, so we now describe $H(\mathbf{l})$ as actuator-range centering and removed the effort claims.
+
+\textit{Changes:} Introduction; Section~3.3.2; Conclusion.
+
+\rc{For both controllers, an ablation with the secondary objective disabled using identical targets would be helpful. Results should report both primary-task error and a quantitative secondary-task metric. A useful experiment could compare multiple configurations reaching the same tip pose and show the resulting tendon margins or values of H(l).}
+\textbf{Response.} Added for both controllers, offline on the same 20 targets. This compares the configurations that reach the same tip poses with and without the objective (without $\to$ with):
+\begin{itemize}
+\item Model-based (control law replayed on the PCC model): $H(\mathbf{l})$ $693 \to 269$; RMS tendon deviation from $\bar{\mathbf{l}}$ $12.0 \to 7.5$~mm; final position error $5.8 \to 5.3$~mm.
+\item Data-driven ($N_l^3$ retrained with $\zeta = 0$ and $0.01$, evaluated through $N_p^3$): $H(\mathbf{l})$ $487 \to 371$; RMS deviation $10.1 \to 8.8$~mm; position error $4.6 \to 5.1$~mm (the penalty trades some accuracy for range centering).
+\end{itemize}
+Both are simulated through the models and labeled as such.
+
+\textit{Changes:} SI Section~5.3; Table~S13; Fig.~S8.
