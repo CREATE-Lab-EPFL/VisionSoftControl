@@ -1,21 +1,16 @@
 """
-Offline ablation of the null-space secondary objective for the model-based
-controller (Eq. 8-10 / Algorithm 1 in the paper).
+Simulated effect of the null-space term of the model-based controller
+(Section 3.3, Algorithm 1; SI Section 6.11, Table S15).
 
-The real closed-loop logs (results/ControlWorkspaceJacobian.npz etc.) only
-ever store the final camera/mocap pose per target, never the tendon lengths
-or motor current, so H(l) cannot be recovered from hardware telemetry after
-the fact. This script instead *replays* the resolved-motion-rate control law
-against the PCC forward-kinematics model, driving through the same 20
-k-medoids targets in the same order, with and without the null-space term
-N @ (DELTAL_mean - DELTAL) -- reusing the exact Jacobian/pseudo-inverse/
-null-space math from MULTIController, but against a simulated forward model
-instead of real cameras and motors.
-
-This is a simulated/offline comparison, not a hardware measurement: it shows
-what the null-space objective is doing to the tendon configuration for a
-given target sequence, holding the target sequence identical between the two
-conditions, which is not something the hardware logs support on their own.
+The closed-loop logs (results/ControlWorkspaceJacobian.npz etc.) store the
+pose reached at each target, not the tendon lengths, so H(l) is evaluated by
+replaying the model-based control law on the PCC forward-kinematics model,
+through the same 20 k-medoids targets in the recorded order, with and without
+the null-space term N @ (DELTAL_mean - DELTAL), with the Jacobian,
+pseudo-inverse and null-space computation of MULTIController. As stated in
+SI Section 6.11, the simulation omits camera noise, cable stretch and
+compliance; the comparison between the two cases is the quantity of interest.
+Writes results/NullSpaceAblation.npz, read by MULTI_nullspace_ablation.ipynb.
 
 Run from within MULTI/.
 """

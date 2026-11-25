@@ -82,10 +82,8 @@ VisionSoftControl/
 │   ├── SINGLE_polygon_figures.ipynb     # Triangle, square, hexagon tracking (SI Figs. S7-S9)
 │   ├── SINGLE_path_error_metrics.ipynb  # RMS radial/height errors of the circles (SI Table S14)
 │   ├── SINGLE_revision_figures.ipynb    # Per-sample test errors (results/revision_single_test.npz)
-│   ├── SINGLE_test_reconstruction.ipynb # Tip-pose test-set statistics
-│   ├── SINGLE_workspace_coverage.ipynb  # Bending range of control targets vs. training workspace
-│   ├── SINGLE_NC_surrogate_validation.ipynb # Validation of the curvature surrogate N_C
-│   ├── SINGLE_MULTI_leakage_check.ipynb # Train/test nearest-neighbour distances, both arms
+│   ├── SINGLE_test_reconstruction.ipynb # Tip-pose errors on a seeded test split, error vs. bending
+│   ├── SINGLE_workspace_coverage.ipynb  # Bending range of control targets vs. training data (SI Table S10)
 │   ├── data/                            # Workspace samples (Workspace.npz)
 │   ├── models/                          # Pre-trained networks (vision, curvature, kinematics)
 │   └── results/                         # Control logs (.npz), metrics (.json), figures (.pdf)
@@ -110,9 +108,8 @@ VisionSoftControl/
     ├── MULTI_redundancy_pairs.ipynb     # Measured configurations with the same tip pose (SI Fig. S10)
     ├── MULTI_per_point_errors.ipynb     # Curvature error per reference point, both arms (SI Fig. S11)
     ├── MULTI_revision_figures.ipynb     # Per-sample test errors, IK secondary-term ablation (SI Table S16)
-    ├── MULTI_test_reconstruction.ipynb  # Tip-pose test-set statistics
-    ├── MULTI_workspace_coverage.ipynb/.py # Bending range of control targets vs. training workspace
-    ├── MULTI_S31_sample_regimes.ipynb/.py # Sample counts per acquisition regime
+    ├── MULTI_test_reconstruction.ipynb  # Absolute/relative tip errors, median and IQR (SI Section 6.2)
+    ├── MULTI_workspace_coverage.ipynb/.py # Bending range of control targets vs. training data (SI Table S10)
     ├── data/                            # Workspace samples (.npz), FK/IK dataset FKdata.pt
     ├── models/                          # Pre-trained networks (vision, curvature, kinematics)
     └── results/                         # Control logs (.npz), metrics (.json), figures (.pdf)
@@ -128,7 +125,6 @@ VisionSoftControl/
 | `const_model.pt` (SINGLE), `constant_model.pt` (MULTI) / `affine_model.pt` / `quadratic_model.pt` | Polynomial curvature CNNs ($f_C^1$ for SINGLE, $f_C^3$ for MULTI) |
 | `kinematics_model.pt` | Inverse kinematics MLP $N_\ell^1$: tip position → $\delta\ell$ (SINGLE) |
 | `*_for_MULTI_model.pt` | Curvature surrogate $N_C$ (one per polynomial model), trained on single-section data; generates the MULTI curvature labels |
-| `NC_surrogate_reconstructed.pt` | Re-trained $N_C$ used by `SINGLE_NC_surrogate_validation.ipynb` |
 | `DELTAL_stats.pt` | Mean tendon vector $\bar\ell$ (mid-range) of the MULTI secondary objective, and its standard deviation |
 
 ### Data
@@ -227,17 +223,19 @@ The 50 g payload experiment is run by setting `WEIGHT = True` at the top of [`MU
 
 ### Supporting Information analyses
 
-These notebooks recompute the corresponding Supporting Information figures and tables from the data in this repository, without hardware:
+These notebooks recompute the corresponding Supporting Information figures and tables without hardware, from the data in this repository (marked *: also the Zenodo dataset):
 
 | Notebook | Output |
 |----------|--------|
 | [`SINGLE_polygon_figures.ipynb`](SINGLE/SINGLE_polygon_figures.ipynb) | Figs. S7–S9: triangle, square and hexagon tracking |
+| [`SINGLE_workspace_coverage.ipynb`](SINGLE/SINGLE_workspace_coverage.ipynb), [`MULTI_workspace_coverage.ipynb`](MULTI/MULTI_workspace_coverage.ipynb) | Table S10: bending range of the control evaluation |
 | [`MULTI_paired_comparison.ipynb`](MULTI/MULTI_paired_comparison.ipynb) | Table S13: paired comparison of the controllers (Wilcoxon signed-rank) |
 | [`SINGLE_path_error_metrics.ipynb`](SINGLE/SINGLE_path_error_metrics.ipynb), [`MULTI_path_error_metrics.ipynb`](MULTI/MULTI_path_error_metrics.ipynb) | Table S14: path errors of the circles |
 | [`MULTI_nullspace_ablation.ipynb`](MULTI/MULTI_nullspace_ablation.ipynb) | Table S15: null-space term of the model-based controller |
-| [`MULTI_revision_figures.ipynb`](MULTI/MULTI_revision_figures.ipynb) | Table S16: secondary term in the training of $N_\ell^3$ (retrains the network, about 20 min on CPU) |
+| [`MULTI_revision_figures.ipynb`](MULTI/MULTI_revision_figures.ipynb)* | Table S16: secondary term in the training of $N_\ell^3$ (retrains the network, about 20 min on CPU); per-sample test errors used by Fig. S11 |
 | [`MULTI_redundancy_pairs.ipynb`](MULTI/MULTI_redundancy_pairs.ipynb) | Fig. S10: measured configurations with the same tip pose |
 | [`MULTI_per_point_errors.ipynb`](MULTI/MULTI_per_point_errors.ipynb) | Fig. S11: curvature error per reference point |
+| [`MULTI_test_reconstruction.ipynb`](MULTI/MULTI_test_reconstruction.ipynb) | Section 6.2: median and interquartile range of the multi-section tip errors (on a test split drawn with `random_state=42`) |
 
 ### Utilities
 

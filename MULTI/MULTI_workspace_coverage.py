@@ -1,24 +1,15 @@
 """
-Comment 7 (MULTI half): bending-angle coverage of the control evaluation vs.
-the training workspace, per section.
+Bending angle of each section for the training data, the control targets and
+the tracked trajectories of the multi-section arm (SI Section 6.5, Table S10).
+Writes results/MULTI_workspace_coverage.npz, read by
+MULTI_workspace_coverage.ipynb.
 
-Training-workspace bending angle comes directly from the stored curvature
-labels (X_quad), same as the SINGLE analysis (see SINGLE_workspace_coverage
-notebook). For the control-evaluation targets, this reuses the already-
-computed, PCC-consistent tendon lengths from MULTI_nullspace_ablation.py's
-"with-null" simulation (results/NullSpaceAblation.npz) rather than
-re-deriving them -- those were obtained by replaying the actual model-based
-control law against the PCC forward model, so they're a faithful (if
-idealized) stand-in for "what configuration these targets correspond to."
-Requires MULTI_nullspace_ablation.py to have been run first.
-
-For the tracked trajectories (many more points), a full PCC-consistent
-replay would be too slow; the data-driven IK network (models/kinematics/
-IK_model.pt) is used instead as a fast approximate inverse. This is a
-coverage CHARACTERIZATION, not a per-controller comparison (unlike the
-null-space ablation, where mixing models would bias the comparison), so
-using the network here is a reasonable, lower-stakes shortcut -- flagged
-here and in the notebook as an estimate, not a measurement.
+Training data: bending angle from the curvature labels (X_quad) of the
+multi-section dataset (data/MULTI_dataset/, from Zenodo). Control targets: the
+PCC-consistent tendon configurations of the "with null space" simulation of
+MULTI_nullspace_ablation.py (results/NullSpaceAblation.npz), which must be run
+first. Tracked trajectories: each point is mapped to a tendon configuration by
+the inverse kinematics network N_l^3 (models/kinematics/IK_model.pt).
 
 Run from within MULTI/.
 """
