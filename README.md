@@ -108,7 +108,7 @@ VisionSoftControl/
     ├── MULTI_redundancy_pairs.ipynb     # Measured configurations with the same tip pose (SI Fig. S10)
     ├── MULTI_per_point_errors.ipynb     # Curvature error per reference point, both arms (SI Fig. S11)
     ├── MULTI_revision_figures.ipynb     # Per-sample test errors, IK secondary-term ablation (SI Table S16)
-    ├── MULTI_test_reconstruction.ipynb  # Absolute/relative tip errors, median and IQR (SI Section 6.2)
+    ├── MULTI_test_reconstruction.ipynb  # Tip errors: Table 2, SI Table S9, medians and IQR of SI Section 6.2
     ├── MULTI_workspace_coverage.ipynb/.py # Bending range of control targets vs. training data (SI Table S10)
     ├── data/                            # Workspace samples (.npz), FK/IK dataset FKdata.pt
     ├── models/                          # Pre-trained networks (vision, curvature, kinematics)
@@ -228,14 +228,14 @@ These notebooks recompute the corresponding Supporting Information figures and t
 | Notebook | Output |
 |----------|--------|
 | [`SINGLE_polygon_figures.ipynb`](SINGLE/SINGLE_polygon_figures.ipynb) | Figs. S7–S9: triangle, square and hexagon tracking |
-| [`SINGLE_workspace_coverage.ipynb`](SINGLE/SINGLE_workspace_coverage.ipynb), [`MULTI_workspace_coverage.ipynb`](MULTI/MULTI_workspace_coverage.ipynb) | Table S10: bending range of the control evaluation |
+| [`SINGLE_workspace_coverage.ipynb`](SINGLE/SINGLE_workspace_coverage.ipynb)*, [`MULTI_workspace_coverage.ipynb`](MULTI/MULTI_workspace_coverage.ipynb) | Table S10: bending range of the control evaluation |
 | [`MULTI_paired_comparison.ipynb`](MULTI/MULTI_paired_comparison.ipynb) | Table S13: paired comparison of the controllers (Wilcoxon signed-rank) |
 | [`SINGLE_path_error_metrics.ipynb`](SINGLE/SINGLE_path_error_metrics.ipynb), [`MULTI_path_error_metrics.ipynb`](MULTI/MULTI_path_error_metrics.ipynb) | Table S14: path errors of the circles |
 | [`MULTI_nullspace_ablation.ipynb`](MULTI/MULTI_nullspace_ablation.ipynb) | Table S15: null-space term of the model-based controller |
 | [`MULTI_revision_figures.ipynb`](MULTI/MULTI_revision_figures.ipynb)* | Table S16: secondary term in the training of $N_\ell^3$ (retrains the network, about 20 min on CPU); per-sample test errors used by Fig. S11 |
 | [`MULTI_redundancy_pairs.ipynb`](MULTI/MULTI_redundancy_pairs.ipynb) | Fig. S10: measured configurations with the same tip pose |
 | [`MULTI_per_point_errors.ipynb`](MULTI/MULTI_per_point_errors.ipynb) | Fig. S11: curvature error per reference point |
-| [`MULTI_test_reconstruction.ipynb`](MULTI/MULTI_test_reconstruction.ipynb) | Section 6.2: median and interquartile range of the multi-section tip errors (on a test split drawn with `random_state=42`) |
+| [`MULTI_test_reconstruction.ipynb`](MULTI/MULTI_test_reconstruction.ipynb)* | Table S9 and Section 6.2: relative tip errors of the multi-section arm, with median and interquartile range (also Table 2 of the main text) |
 
 ### Utilities
 
